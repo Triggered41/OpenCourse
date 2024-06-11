@@ -1,0 +1,56 @@
+.Tooltip{
+    z-index: 5;
+
+    position: absolute;
+
+    width: 40%;
+    left: 30%;
+    margin-top: 3rem;
+
+    font-size: small;
+
+    text-align: center;
+}
+
+.Tips{
+    border-radius: 0.5rem;
+    position: absolute;
+    width: 100%;
+    
+    background-color: #DDD;
+    color: #000;
+    border: solid #69a569;
+
+    scale: 1 0;
+    transform-origin: 0 -1rem;
+
+    overflow: hidden;
+
+    transition: all 200ms;
+}
+
+.Focused{
+    scale: 1 1;
+    transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition-duration: 350ms;
+}
+
+.Tooltip:has(.Focused):before{
+    content: ' ';
+    position: absolute;
+    width: 0;
+    height: 0;
+    top: -40px;
+    left: 35%;
+    border: 22px solid;
+    rotate: 180deg;
+    border-color: #69a569 transparent transparent transparent;
+}
+
+@media screen and (min-width: 600px) {
+    .Tips{
+        width: 50%;
+        margin-inline: 25%;
+
+    }
+}

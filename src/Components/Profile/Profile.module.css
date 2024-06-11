@@ -1,0 +1,67 @@
+
+.Profile{
+    display: flex;
+    flex-direction: row;
+    padding: 2rem;
+    margin-inline: 15rem;
+    /* background-color: pink; */
+}
+
+.Profile .PicHolder{
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    width: 50%;
+    /* background-color: gray; */
+}
+
+.Profile .PicHolder .Picture{
+    user-select: none;
+    width: 15rem;
+    height: auto;
+    object-fit: cover;
+    object-position: -150px 40px;
+    clip-path: circle();
+    /* border-radius: 50%; */
+}
+
+.Profile .Details{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    gap: 1rem;
+    width: 50%;
+    /* background-color: paleturquoise; */
+}
+
+.Profile .Details .Field{
+    padding: 0.5rem;
+    font-size: larger;
+    text-align: center;
+    border: none;
+    background-color: transparent;
+    /* background-image: linear-gradient(to right, palevioletred, #ffffffe0); */
+}
+
+.Title{
+    text-align: center;
+    /* padding-left: 25%; */
+    font-weight: 400;
+    margin: 0;
+    color: #efefef;
+    background-image: linear-gradient(to right, #40bf95, #FFF0 175%);
+}
+
+.Grid{
+    display: grid;
+    grid-template-columns: auto auto auto;
+    /* column-gap: 5rem; */
+
+    justify-content: center;
+}
+@media screen and (max-width: 600px) {
+    .Grid{
+        grid-template-columns: auto;
+    }
+}

@@ -1,0 +1,67 @@
+
+.Card{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    width: 300px;
+    height: 400px;
+    margin: 1rem;
+
+    box-shadow: #00000040 0px 0px 8px;
+    
+    border-radius: 20px;
+    background-color: #efefef;
+
+    /* overflow: hidden; */
+    transition: transform cubic-bezier(0.535, -1.00, 0.420, 2.0) 500ms, box-shadow 500ms;
+}
+
+.Card:hover{
+    box-shadow: #00000040 3px 3px 15px;
+    transform: scale(1.025);
+    
+}
+.Card .ImgHolder{
+    display: flex;
+    
+    width: 90%;
+    height: 50%;
+    margin-top: 5%;
+
+    text-align: center;
+    justify-content: center;
+
+    background-color: transparent;
+    overflow: hidden;
+    
+    border-radius: 10px;
+    transition: transform cubic-bezier(0.535, -1.00, 0.420, 2.0) 500ms, box-shadow 250ms;
+}
+
+.Card .ImgHolder:hover{
+    transform: scale(1.03);
+    box-shadow: 0px 0px 15px 4px #00000040;
+}
+
+
+.Card .ImgHolder .Image{
+    width: auto;
+    height: 100%;
+    align-self: center;
+}
+
+.Card .Title{
+    width: 90%;
+    padding-top: 0.75rem;
+
+    font-size: large;
+
+    color: #000000D0;
+}
+.Card .Details{
+    width: 90%;
+    text-align: justify;
+    padding-top: 0.5rem;
+    /* border-top: solid #00000020; */
+    color: #000000D0;
+}

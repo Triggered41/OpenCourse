@@ -1,0 +1,176 @@
+:root{
+    height: 101vh;
+}
+
+.ImgHolder .Image{
+    background-color: black;
+    width: auto;
+    height: 100%;
+    object-fit: contain;
+}
+
+.WelcomeSection .Details{
+    width: 50%;
+    background-color: cadetblue;
+}
+
+.Title{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(39, 39, 39);
+    /* background-color: #efefef; */
+    margin: 0;
+
+    font-weight: 400;
+    font-style: italic;
+    /* text-align: center; */
+}
+
+.Intro{
+    margin-inline: 20%;
+    font-weight: 200;
+    font-size: large;
+}
+
+.Section{
+    font-size: large;
+    background-color: whitesmoke;
+    color: #000000C0;
+
+    /* background-color: #f08080A0; */
+}
+.Section .Title{
+    color: #000000C0;
+    font-weight: 300;
+    padding-left: 3rem;
+    text-align: center;
+
+    background-image: linear-gradient(to right, #40bf95, #FFF0);
+    transition: all 100ms;
+}
+.Section .Title:hover{
+    position: relative;
+    text-decoration: underline;
+    box-shadow: #0004 0px 3px 8px;
+    transform: scale(1.005);
+    z-index: 1;
+}
+.Section .Title::after{
+    font-style: normal;
+    content: attr(data-symbol);
+}
+
+.Section .List{
+    /* padding-left: 6rem; */
+    height: 0px;
+    /* width: 45%; */
+    overflow: hidden;
+
+    transition: all 500ms;
+}
+
+.Section .List .Item{
+    font-weight: 300;
+    font-size: larger;
+    margin: 0;
+    padding-block: 0.25rem;
+    padding-left: 7rem;
+
+    text-align: center;
+    
+    border: 10px solid;
+    border-image-slice: 1;
+    border-width: 3px;
+    border-image-source: linear-gradient(to left, #FFFFFF00, #00000030);
+    border-top: 0;
+    border-left: 0;
+    border-left: 0;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    
+    transition: all 100ms;
+}
+.Section .List .Item:hover{
+    text-decoration: underline;
+    box-shadow: #0004 0px 3px 8px;
+    transform: scale(1.005);
+}
+
+.Section .List .Item:first-child{
+    border-top: solid;
+}
+.Section .List .Item::before{
+    content: '→';
+}
+.Section .List p{
+    margin: 0;
+    margin-top: 0.5rem;
+}
+@media screen and (max-width: 600px) {
+    .Section .List .Item{
+        font-size: large;
+    }
+}
+
+.AddImg{
+    user-select: none;
+    padding: 0.5rem;
+    width: 2rem;
+}
+
+.Title:hover .AddImg{
+    filter:  drop-shadow(#00000040 0 2px );
+}
+
+.Title:active .AddImg{
+    scale: 0.9;
+}
+
+.Form{
+    background-color: #FFFFFF30;
+    border-radius: 0.25rem;
+    width: 70%;
+    max-height: 60%;
+    padding: 1rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.Form input:not([type='submit']){
+    margin-bottom: 1rem;
+}
+
+.Form input:is([type='submit']){
+    position: absolute;
+    bottom: 2rem;
+    left: 35%;
+}
+
+.Remove{
+    z-index: 1;
+    grid-column-start: 1;
+    grid-row-start: 1;
+    padding-top: 0.3rem;
+    margin-left: 90%;
+}
+
+.Remove:hover{
+    filter: drop-shadow(#0005 1px 1px);
+    scale: 1.05;
+}
+
+.Remove:active{
+    scale: 0.95;
+}
+
+.Empty{
+    animation: emp 250ms;
+}
+
+@keyframes emp {
+    0% { scale: 1 0; height: 0;}
+    100% {scale: 1 1; height: 3rem;}
+}

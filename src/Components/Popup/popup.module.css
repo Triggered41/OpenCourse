@@ -1,0 +1,104 @@
+.BG{
+    z-index: 2;
+    pointer-events:  none;
+    position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    /* backdrop-filter: blur(5px); */
+    /* filter: grayscale(); */
+    /* background-color: black; */
+    transition: all 500ms;
+}
+
+.BG:has(.Reveal){
+    backdrop-filter: blur(1px) grayscale(0.2);
+    /* background-color: pink; */
+}
+
+.Popup{
+    
+    pointer-events: all;
+    display: flex;
+    width: 35%;
+    height: 80%;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 0.5rem;
+    
+    /* background-color: #DDD; */
+    background-image: linear-gradient(to right, #40bf95, #72e0bb);
+
+    box-shadow: #00000080 0 0 15px;
+
+    translate: 0 100vh;
+    transition: all 500ms cubic-bezier(.81,-0.44,.23,1.38);
+}
+
+.Title{
+    width: 100%;
+    text-align: center;
+    color: white;
+    font-weight: 400;
+}
+
+.InputHolder{
+    display: flex;
+    flex-direction: column;
+    width: 75%;
+    padding: 0;
+    margin: 0;
+    align-items: center ;
+
+}
+
+.InputHolder .InputBox{
+    margin: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.InputHolder .InputField{
+    border: none;
+    width: 20rem;
+    padding: 1rem;  
+
+    font-weight: 500;
+    font-size: medium;
+
+    color: #000000D0;
+    outline: solid #00000080 2px;
+    background-color: #EAEAEA;
+    box-shadow: #00000080 3px 3px 5px;
+
+    border-radius: 0.25rem;
+    transition: all 250ms;
+}
+.InputHolder .Label{
+    pointer-events: none;
+    position: absolute;
+    /* padding-left: 1rem; */
+    color: #000000D0;
+    /* background-color: #2d682d; */
+
+    transition: all 250ms;
+}
+
+.InputHolder .InputField:is(textarea){
+    height: 10rem;
+}
+.Reveal{
+    translate: 0 0;
+}
+
+.ColorBox{
+    background-color: #EAEAEA;
+    width: 20rem;
+    
+}
+

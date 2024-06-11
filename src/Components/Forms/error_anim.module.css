@@ -1,0 +1,21 @@
+@keyframes error {
+    0% {translate: -1rem 0;}
+    25% {translate: 1rem 0;}
+    50% {translate: -1rem 0;}
+    75% {translate: 1rem 0;}
+    100% {translate: 0 0;}
+}
+
+.Error{
+    animation-name: error;
+    animation-duration: 0.25s;
+}
+
+.Warning{
+    position: absolute;
+    translate: -2rem -1.75rem;
+    font-size:x-large;
+    font-weight: 500;
+    /* background-color: black; */
+    color: red;
+}

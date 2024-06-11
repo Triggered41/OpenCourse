@@ -1,0 +1,54 @@
+.NavigationBar{
+    /* position: fixed; */
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    height: 3rem;
+    width: 100%;
+    background-color: #efefef;
+    z-index: 10;
+}
+
+.NavigationBar a{
+    display: flex;
+    align-items: center;
+    height: 100%;
+    color: rgb(78, 89, 94);
+    text-decoration: none;
+    padding-inline: 1rem;
+    font-size: large;
+    border-left: solid #00000020;
+}
+
+.NavigationBar a:hover{
+    color: black;
+    background-color: #00000020;
+    border-radius: 5px;
+}
+
+.NavigationBar a:active{
+    background-color: #00000040;
+}
+
+.NavigationBar .Logo{
+    /* font-weight: 400; */
+    font-size: 2rem;
+    padding-inline: 1rem;
+    margin-right: auto;
+}
+
+.PFP{
+    height: 80%;
+    width: auto;
+    clip-path: circle();
+    border-left: solid #00000020;
+}
+@media screen and (max-width: 600px){
+    .NavigationBar a{
+        padding-inline: 0.25rem;
+    }
+    .NavigationBar .Logo{
+        /* font-weight: 400; */
+        font-size: medium;
+    }
+}

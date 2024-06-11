@@ -1,0 +1,87 @@
+:root{
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+}
+
+.ShowCase{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    width: 100%;
+    height: 50vh;
+    
+    background-color: black;
+    background-image: url('./1080archy.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+
+    transition: all 1s;
+}
+
+.ShowCase .BgBlur{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 100%;
+    
+    color: black;
+    background-color: #00000000;
+    backdrop-filter: blur(1px);
+}
+
+.button{
+    width: 8rem;
+    height: 3rem;
+
+    border-radius: 10px;
+    border: none;
+
+    font-size: large;
+    
+    color: white;
+    background-color: rgb(65, 161, 65);
+
+    box-shadow: #00000080 4px 4px 8px;
+    
+    transition: all 450ms cubic-bezier(0.535, -1.00, 0.420, 2.0);
+    outline: solid #FFFFFF80 0px;
+}
+
+.button:hover{
+    transform: scale(1.05);
+    outline: solid #9fe9a9F0 5px;
+}
+
+.ShowCase button:active{
+    background-color: rgb(90, 194, 90);
+    border: none;
+    box-shadow: none;
+    outline: none;
+    transform: scale(0.975);
+}
+
+.ShowCase img{
+    padding-top: 3px;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+
+    filter: blur(3px);
+}
+
+.Grid{
+    display: grid;
+    grid-template-columns: auto auto auto;
+    column-gap: 5rem;
+
+    justify-content: center;
+}
+@media screen and (max-width: 600px) {
+    .Grid{
+        grid-template-columns: auto;
+    }
+}

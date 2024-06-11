@@ -1,0 +1,59 @@
+.InputField{
+    margin-block: 1rem;
+    /* display: flex; */
+    /* align-items: center; */
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+}   
+
+
+.InputField .Filled{
+    color: black;
+    padding-left: 0rem;
+    transform: translateY(-2rem);
+}
+
+
+.Label{
+    z-index: 1;
+    grid-row-start: 1;
+    grid-column-start: 1;
+    pointer-events: none;
+    padding-top: 0.25rem;
+    padding-left: 1rem;
+    color: #000000D0;
+    box-sizing: border-box;
+    /* background-color: #2d682d; */
+
+    transition: all 250ms;
+}
+
+.TypeField{
+    grid-row-start: 1;
+    grid-column-start: 1;
+    border: none;
+
+    padding: 0.5rem;
+    padding-inline: 1rem;
+
+    font-weight: 500;
+    font-size: medium;
+
+    color: #000000D0;
+    outline: solid #00000080 2px;
+    background-color: #69a56900;
+    box-shadow: #00000080 3px 3px 5px;
+
+    border-radius: 0.25rem;
+    transition: all 250ms;
+}
+
+.TypeField:focus{
+    /* outline: none; */
+    border: none;   
+    outline: solid rgb(39, 159, 199) 4px;
+    transform: scale(1.0125);
+    box-shadow: #00000080 3px 3px 10px;
+}
+
