@@ -15,6 +15,7 @@ import { postApi } from '../../APIHandler/apiHandler'
 import { PopupCard } from '../Popup/Popup'
 import { InputField } from '../InputField/InputField'
 import { FaDeleteLeft } from 'react-icons/fa6'
+import { Draggable } from '../Draggable/Draggable'
 
 const getCourse = async () => {
     console.log("OK: ", window.location.pathname)
@@ -56,11 +57,28 @@ export function CoursePage() {
 
 var keyIndex = 0
 export function Course({chaps}) {
+    
     const[sections, setSections] = useState([])
     const[popup, setPopup] = useState(false)
     
     const[heldItem, setHeldItem] = useState()
     const[empty, setEmpty] = useState({id:-1})
+
+    const[chapters, setChapters] = useState()
+    // const chapters = chaps.map(chp=>(
+    //         <Chapter key={chp.id} id={chp.id} title={chp.Name} sections={chp.Sections}/>
+    //     ))
+
+    useEffect(()=>{
+        if (chaps.length > 0){
+            const temp = chaps.map(chp=>(
+                <Chapter key={chp.id} id={chp.id} title={chp.Name} sections={chp.Sections}/>
+            ))
+            console.log("Chapters: ", chaps)
+            console.log("Temp: ", temp)
+            setChapters(temp)
+        }
+    }, [chaps])
     
     const addChapter = () => {
         setPopup(true)
@@ -129,9 +147,10 @@ export function Course({chaps}) {
 
     return (
         <div>
-            {chaps.map(chp=>(
+            {chapters?<Draggable Items={chapters} Decoy={<EmptySection key={(keyIndex++)+10} title={'Drop Here?'}/>} />:''}
+            {/* {chaps.map(chp=>(
                 <Chapter key={chp.id} id={chp.id} title={chp.Name} sections={chp.Sections}/>
-            ))}
+            ))} */}
             <div onClick={addChapter} className={styles.Section}>
                 <h2 className={styles.Title}><img className={styles.AddImg} src={addImg} alt="" /></h2>
             </div>
@@ -159,24 +178,25 @@ export function Chapter({title, sections, id}) {
     const ele = useRef();
     const symbol = useRef();
     const [isOpen, setIsOpen] = useState(false);
+
     const items = (sections.map((item, i)=>(
-        <p key={i} id={id} className={styles.Item}></p>,
         <Section key={i} chp_id={id} id={i} title={item.Name+': '+(item.Content??'')}/>
     )))
 
     
     const onClick = (ev) => {
-        ele.current.style.height = isOpen ? '0px' : (items.length*42.5)+'px';
+        ele.current.style.height = isOpen ? '0px' : (items.length*47)+'px';
         symbol.current.setAttribute("data-symbol", isOpen ? ' ▸' : '    ▾');
         console.log(id)
         setIsOpen(!isOpen)
     }
 
     return (
-        <div className={styles.Section}>
-            <h2 onClick={onClick} ref={symbol} data-symbol=" ▸" className={styles.Title}>{title}</h2>
-            <div ref={ele} className={styles.List}>
+        <div draggable='false' className={styles.Section}>
+            <h2 draggable='false' onClick={onClick} ref={symbol} data-symbol=" ▸" className={styles.Title}>{title}</h2>
+            <div draggable='false' ref={ele} className={styles.List}>
                 {items}
+                {/* {<Draggable Items={items} Decoy={<EmptySection key={(keyIndex++)+10} title={'Drop Here?'}/>} />} */}
             </div>
         </div>
     )
@@ -193,7 +213,7 @@ export function Section({title, chp_id, id}) {
         nav(`${path}id?chp=${chp_id}&sec=${id}`)
     }
     return (
-        <p onClick={onSectionClick} className={styles.Item}>{title}</p>
+        <p draggable='false' onClick={onSectionClick} className={styles.Item}>{title}</p>
     )
 }
 
@@ -212,5 +232,11 @@ function Empty({value}){
         <div className={styles.Empty}>
         <InputField label={value} />
         </div>
+    )
+}
+
+function EmptySection({title}){
+    return (
+        <p className={styles.Item}>{title}</p>
     )
 }

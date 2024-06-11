@@ -1,0 +1,19 @@
+.Ghost{
+    user-select: none;
+    position: absolute;
+    display: flex;
+
+    left: -10rem;
+    width: 10rem;
+    height: 2rem;
+
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 0.5rem;
+
+    color: white !important;
+    opacity: 2 !important;
+    background-color: #69aF;
+
+}
