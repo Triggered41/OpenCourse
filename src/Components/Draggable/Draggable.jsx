@@ -1,24 +1,8 @@
 import { useState } from "react"
 
 
-var keyIndex = 4
-export function DragMenu(){
-    
-    const[itemList, setItemList] = useState([
-        {id: 0, index: 0, value: 'Hi'},
-        {id: 1, index: 1, value: 'Who'},
-        {id: 2, index: 2, value: 'Are'},
-        {id: 3, index: 3, value: 'You?'},
-    ])
-
-    return (
-        <Draggable itemList={itemList} setItemList={setItemList} Item={DragMe} Decoy={MeDecoy}/>
-    )
-}
-
-
-export function Draggable({itemList, setItemList, Item, Decoy}){
-
+export function Draggable({itemList, setItemList, Item, Decoy, keyIndex, setKeyIndex}){
+    // const[keyIndex, setKeyIndex] = useState(itemList.length)
     
     const[heldItem, setHeldItem] = useState()
     const[empty, setEmpty] = useState({id:-1})
@@ -44,7 +28,8 @@ export function Draggable({itemList, setItemList, Item, Decoy}){
             index = parseInt(index)
             setOverlapElement(index)
             var temp = [...itemList]
-            const element = {id:keyIndex++, index: index, type: 'Empty', value:heldItem.value}
+            const element = {id:keyIndex, index: index, type: 'Empty', value:heldItem.value}
+            setKeyIndex(keyIndex+1)
             temp = temp.filter(val=>val.id!=empty.id)
             temp.splice(index, 0, element)
 
@@ -54,12 +39,19 @@ export function Draggable({itemList, setItemList, Item, Decoy}){
         }
     }
 
+    const onDrop = (ev) => {
+        ev.preventDefault()
+        console.log("Drop")
+    }
+
     // When let go of grabbed element
-    const onDragEnd = () => {
+    const OnDragEnd = (ev) => {
+        console.log("END")
         var temp = [...itemList]
         temp = temp.filter(val=>val.id!=empty.id)
         temp = temp.filter(val=>val.index!=heldItem.index)
-        const element = {id: keyIndex++, index: empty.index, value: heldItem.value}
+        const element = {id: keyIndex, index: empty.index, value: heldItem.value}
+        setKeyIndex(keyIndex+1)
         temp.splice(empty.index, 0, element)
 
         temp.forEach((ele, i)=>{
@@ -80,33 +72,11 @@ export function Draggable({itemList, setItemList, Item, Decoy}){
                     value={val.value}
                     onDragStart={onDragStart}
                     onDragOver={onDragOver}
-                    onDragEnd={onDragEnd}
+                    onDragEnd={OnDragEnd}
+                    
                 />
             )}
         </div>
     )
     
-}
-
-
-function DragMe({id, index, value, onDragStart, onDragOver, onDragEnd, children }){
-    return (
-        <div
-        style={{width: '100%',backgroundColor: 'pink'}}
-        draggable='true'
-        onDragStart={onDragStart}
-        onDragOver={onDragOver}
-        onDragEnd={onDragEnd}
-        data-index={index}
-        data-value={value}
-        
-        >{value}
-        </div>
-    )
-}
-
-function MeDecoy(){
-    return (
-        <div>Decoy</div>
-    )
 }

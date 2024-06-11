@@ -16,7 +16,8 @@ import { Profile } from './Components/Profile/Profile';
 import { Card } from './Components/Card/Card';
 import { InputField } from './Components/InputField/InputField';
 import { PopupCard } from './Components/Popup/Popup';
-import { DragMenu, Draggable } from './Components/Draggable/Draggable';
+import { Draggable } from './Components/Draggable/Draggable';
+import { DragMenu } from './Components/Draggable/testDrag';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
