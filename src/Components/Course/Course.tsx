@@ -1,13 +1,13 @@
-import { useEffect, useRef, useState } from "react";
-import { url } from "../URL";
+import { RefObject, useEffect, useRef, useState } from "react";
+// import { url } from "../URL";
 
 import styles from './Course.module.css'
-import Bar from "../NavBar/NavBar";
-import { getApi } from "../../APIHandler/apiHandler";
+import Bar from "../NavBar/NavBar.tsx";
+import { getApi } from "../../APIHandler/apiHandler.tsx";
 
 async function getData(){
-    const params = new Proxy(new URLSearchParams(window.location.search), {
-        get: (searchParams, prop) => searchParams.get(prop),
+    const params: ObjectX = new Proxy(new URLSearchParams(window.location.search), {
+        get: (searchParams, prop:string) => searchParams.get(prop),
       });
     console.log(`${window.location.pathname}?chp=${params.chp}&sec=${params.sec}`)
     const request = await getApi(`${window.location.pathname}?chp=${params.chp}&sec=${params.sec}`)
@@ -15,16 +15,16 @@ async function getData(){
     return data;
 }
 
-export function Course(props) {
-    const [data, setData] = useState({Name: "Title", Content: 'Loading...'})
-    const ele = useRef();
+export function Course() {
+    const [data, setData] = useState<ObjectX>({Name: "Title", Content: 'Loading...'})
+    const ele: RefObject<HTMLDivElement> = useRef(null);
 
     useEffect(()=>{
         getData()
         .then(res=>{
             if (res){
                 setData(res)
-                ele.current.innerHTML = res.Content
+                ele.current!.innerHTML = res.Content
             }else{
                 setData({Name: "404: Chapter or Section not found"})
             }

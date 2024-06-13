@@ -2,11 +2,11 @@ import styles from './NavBar.module.css'
 import { Link } from "react-router-dom";
 
 import img from '../BGTeddy.png'
-import { postApi } from '../../APIHandler/apiHandler';
+// import { postApi } from '../../APIHandler/apiHandler.tsx';
 import { useEffect, useState } from 'react';
-import { checkLogin } from '../../APIHandler/checkLogin';
+import { checkLogin } from '../../APIHandler/checkLogin.tsx';
 
-export default function Bar(params) {
+export default function Bar() {
     const[isUserLoggedIn, setIsUserLoggedIn] = useState(false);
 
     useEffect(()=>{

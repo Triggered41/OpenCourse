@@ -1,5 +1,5 @@
 const URL = "http://192.168.1.5:3300/"
 
-export function url(path){
+export function url(path: string){
     return `${URL}${path}`
 }

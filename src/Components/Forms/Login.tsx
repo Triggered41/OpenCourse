@@ -1,17 +1,17 @@
-import { useEffect, useRef, useState } from 'react'
+import { RefObject, useEffect, useRef, useState } from 'react'
 import styles from './Form.module.css'
 import ErrorAnim from './error_anim.module.css'
-import { Link, json, useNavigate } from 'react-router-dom';
-import { url } from '../URL';
-import { onFieldChange } from '../InputField/inputFieldAnim';
-import { postApi, setToken } from '../../APIHandler/apiHandler';
-import Bar from '../NavBar/NavBar';
-import { InputField } from '../InputField/InputField';
+import { Link, useNavigate } from 'react-router-dom';
+// import { url } from '../URL';
+// import { onFieldChange } from '../InputField/inputFieldAnim';
+import { postApi, setToken } from '../../APIHandler/apiHandler.tsx';
+import Bar from '../NavBar/NavBar.tsx';
+import { InputField } from '../InputField/InputField.tsx';
 
 export function LoginForm() {
-    const userRef = useRef();
-    const passRef = useRef();
-    const errRef = useRef();
+    // const userRef = useRef();
+    // const passRef = useRef();
+    const errRef: RefObject<HTMLHeadingElement> = useRef(null);
 
     const [user, setUser] = useState('')
     const [pass, setPass] = useState('')
@@ -22,9 +22,9 @@ export function LoginForm() {
         document.body.style.overflow = 'hidden'
     }, [])
 
-    const onSubmit = (ev)=>{
+    const onSubmit = (ev: SubmitEvent)=>{
         ev.preventDefault();
-        errRef.current.classList.remove(ErrorAnim.Error)
+        errRef.current!.classList.remove(ErrorAnim.Error)
         postApi('login', {User: user, Password: pass})
         .then(res => res.json())
         .then(data => {
@@ -34,7 +34,7 @@ export function LoginForm() {
                 nav(`/user/${data.UserName}`)
                 nav(0)
             }else{
-                errRef.current.classList.add(ErrorAnim.Error)
+                errRef.current!.classList.add(ErrorAnim.Error)
             }
             setUserFound(!!data.UserName)
         });
@@ -42,7 +42,7 @@ export function LoginForm() {
     return (
         <>
         <Bar />
-        <form className={styles.Form} onSubmit={onSubmit}>
+        <form className={styles.Form} onSubmit={(e: any)=>onSubmit(e)}>
             <div className={styles.InputHolder}>
                 <h3 ref={errRef} style={{position: 'absolute', top: '9rem', color: 'red'}}>{!userFound && "User not found"}</h3>
                 <h1 className={styles.Title}>LOGIN</h1> 

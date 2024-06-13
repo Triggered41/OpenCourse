@@ -1,25 +1,25 @@
-import React from 'react';
+// import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.module.css';
 import './snow.css';
 import './custom_toolbar.css';
 import App from './App';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
-import { RegisterForm } from './Components/Forms/Register';
-import { LoginForm } from './Components/Forms/Login';
-import { HomePage } from './Components/homepage';
-import { CoursePage } from './Components/Course/CoursePage';
-import { Course } from './Components/Course/Course';
-import { Test } from './Components/Course/test';
-import { PageCreator } from './Components/Creator/PageCreator';
-import { Profile } from './Components/Profile/Profile';
-import { Card } from './Components/Card/Card';
-import { InputField } from './Components/InputField/InputField';
-import { PopupCard } from './Components/Popup/Popup';
-import { Draggable } from './Components/Draggable/Draggable';
-import { DragMenu } from './Components/Draggable/testDrag';
+import { RegisterForm } from './Components/Forms/Register.tsx';
+import { LoginForm } from './Components/Forms/Login.tsx';
+import { HomePage } from './Components/homepage.tsx';
+import { CoursePage } from './Components/Course/CoursePage.tsx';
+import { Course } from './Components/Course/Course.tsx';
+// import { Test } from './Components/Course/test';
+// import { PageCreator } from './Components/Creator/PageCreator.tsx';
+import { Profile } from './Components/Profile/Profile.tsx';
+// import { Card } from './Components/Card/Card.tsx';
+// import { InputField } from './Components/InputField/InputField.tsx';
+// import { PopupCard } from './Components/Popup/Popup.tsx';
+// import { Draggable } from './Components/Draggable/Draggable.tsx';
+import { DragMenu } from './Components/Draggable/testDrag.tsx';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
 const router = createBrowserRouter([
   {
@@ -52,7 +52,7 @@ const router = createBrowserRouter([
   },
   {
     path: 'user/:Profile/PageCreator',
-    element: <PageCreator />
+    // element: <PageCreator />
   },
   {
     path: '/test',

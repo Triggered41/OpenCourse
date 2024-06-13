@@ -1,21 +1,46 @@
 import styles from './CoursePage.module.css'
 import buttonStyles from '../Button/ButtonStyles.module.css'
 
-import Bar from "../NavBar/NavBar"
+import Bar from "../NavBar/NavBar.tsx"
 
-import img1 from '../BGTeddy.png'
+// import img1 from '../BGTeddy.png'
 import addImg from './AddImg.png'
 
-import { ImgTextSection } from '../ImgTextSection'
-import { useEffect, useReducer, useRef, useState } from 'react'
-import Footer from '../Footer'
+import { ImgTextSection } from '../ImgTextSection.tsx'
+import { DragEvent, DragEventHandler, MouseEvent, RefObject, useEffect, useRef, useState } from 'react'
+import Footer from '../Footer.tsx'
 import { useNavigate } from 'react-router-dom'
-import { url } from '../URL'
-import { postApi } from '../../APIHandler/apiHandler'
-import { PopupCard } from '../Popup/Popup'
+// import { url } from '../URL'
+import { postApi } from '../../APIHandler/apiHandler.tsx'
+import { PopupCard } from '../Popup/Popup.tsx'
 import { InputField } from '../InputField/InputField'
 import { FaDeleteLeft } from 'react-icons/fa6'
-import { Draggable } from '../Draggable/Draggable'
+import { Draggable } from '../Draggable/Draggable.tsx'
+import { FaRegEdit } from 'react-icons/fa'
+
+interface ChapterProps{
+    title: string,
+    sections: AnyObject,
+    id: Number|string,
+    setPopup: Function
+}
+
+interface SectionProps{
+    title: string,
+    chp_id: Number|string,
+    id: Number
+}
+
+interface SectionFieldProps{
+    index?: any,
+    id?: Number,
+    remove?: Function
+    value?: string,
+    onDragOver?: DragEventHandler<HTMLDivElement>,
+    onDragStart?: DragEventHandler<HTMLDivElement>,
+    onDrop?: DragEventHandler<HTMLDivElement>,
+    OnDragEnd?: DragEventHandler<HTMLDivElement>
+}
 
 const getCourse = async () => {
     console.log("OK: ", window.location.pathname)
@@ -28,7 +53,7 @@ const getCourse = async () => {
 export function CoursePage() {
     const[title, setTitle] = useState('Course Name')
     const[intro, setIntro] = useState('Introduction')
-    const[chapters, setChapters] = useState([])
+    const[chapters, setChapters]: Array<any> = useState([])
 
     useEffect( ()=>{
         getCourse()
@@ -36,8 +61,8 @@ export function CoursePage() {
             setTitle(course.Name)
             setIntro(course.Intro)
 
-            var temp = []
-            course.Chapters.forEach((chapter, i) => {
+            var temp:Array<any> = []
+            course.Chapters.forEach((chapter: AnyObject, i: number) => {
                 temp.push({id: i, Name: chapter.Name, Sections:chapter.Sections})
             });
             setChapters(temp)
@@ -56,23 +81,23 @@ export function CoursePage() {
 }
 
 var keyIndex = 0
-export function Course({chaps}) {
+export function Course({chaps}:{chaps:Array<any>}) {
     
-    const[sections, setSections] = useState([])
+    const[sections, setSections]: any = useState([])
     const[popup, setPopup] = useState(false)
     
-    const[heldItem, setHeldItem] = useState()
-    const[empty, setEmpty] = useState({id:-1})
+    const[heldItem, setHeldItem]: any = useState()
+    const[empty, setEmpty] = useState<ObjectX>({id:-1})
 
-    const[chapters, setChapters] = useState()
+    const[chapters, setChapters]: any = useState()
     // const chapters = chaps.map(chp=>(
     //         <Chapter key={chp.id} id={chp.id} title={chp.Name} sections={chp.Sections}/>
     //     ))
 
     useEffect(()=>{
         if (chaps.length > 0){
-            const temp = chaps.map(chp=>(
-                <Chapter key={chp.id} id={chp.id} title={chp.Name} sections={chp.Sections}/>
+            const temp: JSX.Element[] = chaps.map(chp=>(
+                <Chapter setPopup={setPopup} key={chp.id} id={chp.id} title={chp.Name} sections={chp.Sections}/>
             ))
             console.log("Chapters: ", chaps)
             console.log("Temp: ", temp)
@@ -91,28 +116,28 @@ export function Course({chaps}) {
 
     }
 
-    const removeSection = (id) => {
+    const removeSection = (id: Number) => {
         console.log('E: ', id)
-        const temp = sections.filter(section => section.id != id);
-        temp.forEach((val, i)=>val.index=i)
+        const temp = sections.filter(((section:any) => section.id != id));
+        temp.forEach((val:any, i:Number)=>val.index=i)
         setSections(temp)
     }
 
     // When an element is grabbed (ev is the grabbed element)
-    const onDragStart = (ev) => {
+    const onDragStart = (ev:DragEvent<HTMLDivElement>) => {
         console.log("Start: ", ev.target)
         setHeldItem({
-            index: ev.target.dataset.index,
-            value: ev.target.getElementsByTagName('input')[0].value})
-        console.log("grabbed: ", ev.target.dataset.index, ', ', ev.target.getElementsByTagName('input')[0].value)
+            index: ev.currentTarget!.dataset.index,
+            value: ev.currentTarget.getElementsByTagName('input')[0].value})
+        console.log("grabbed: ", ev.currentTarget.dataset.index, ', ', ev.currentTarget.getElementsByTagName('input')[0].value)
 
     }
 
     const[overlapElement, setOverlapElement] = useState()
     // Whenever the grabbed element moves on top of another element (e is the the element already in place)
-    const onDragOver = (e) => {
-        e.preventDefault()
-        var index = e.target.dataset.index
+    const onDragOver = (ev: DragEvent<HTMLDivElement>) => {
+        ev.preventDefault()
+        var index: any = ev.currentTarget.dataset.index
         if (index != undefined && overlapElement != index){
             index = parseInt(index)
             setOverlapElement(index)
@@ -158,7 +183,7 @@ export function Course({chaps}) {
             <form className={styles.Form}>
                 <InputField customStyle={{backgroundColor: '#DDD'}} label={'Chapter Name'}/>
                 {
-                    sections.map((val) => 
+                    sections.map((val: any) => 
                         val.type ? <Empty value={val.value} key={val.id}/> : <SectionField value={val.value} OnDragEnd={onDragEnd} onDragOver={onDragOver} onDragStart={onDragStart} key={val.id} id={val.id} index={val.index} remove={removeSection}/>
                     )
                 }
@@ -174,27 +199,34 @@ export function Course({chaps}) {
 }
 
 
-export function Chapter({title, sections, id}) {
-    const ele = useRef();
-    const symbol = useRef();
+export function Chapter({title, sections, id, setPopup}: ChapterProps) {
+    const ele: RefObject<HTMLDivElement> = useRef(null);
+    const symbol: RefObject<HTMLHeadingElement> = useRef(null);
     const [isOpen, setIsOpen] = useState(false);
 
-    const items = (sections.map((item, i)=>(
+    const items = (sections.map((item: any, i: any)=>(
         <Section key={i} chp_id={id} id={i} title={item.Name+': '+(item.Content??'')}/>
     )))
 
     
-    const onClick = (ev) => {
-        ele.current.style.height = isOpen ? '0px' : (items.length*47)+'px';
-        symbol.current.setAttribute("data-symbol", isOpen ? ' ▸' : '    ▾');
+    const onClick = () => {
+        ele.current!.style.height = isOpen ? '0px' : (items.length*47)+'px';
+        symbol.current!.setAttribute("data-symbol", isOpen ? ' ▸' : '    ▾');
         console.log(id)
         setIsOpen(!isOpen)
     }
+    const onEditClick = (ev: MouseEvent|TouchEvent) => {
+        ev.stopPropagation()
+        setPopup(true)
+    }
 
     return (
-        <div draggable='false' className={styles.Section}>
-            <h2 draggable='false' onClick={onClick} ref={symbol} data-symbol=" ▸" className={styles.Title}>{title}</h2>
-            <div draggable='false' ref={ele} className={styles.List}>
+        <div className={styles.Section}>
+            <div className={styles.box} onClick={onClick}>
+                <FaRegEdit onClick={onEditClick} className={buttonStyles.Edit}/>
+                <h2 ref={symbol} data-symbol=" ▸" className={styles.Title}>{title}</h2>
+            </div>
+            <div ref={ele} className={styles.List}>
                 {items}
                 {/* {<Draggable Items={items} Decoy={<EmptySection key={(keyIndex++)+10} title={'Drop Here?'}/>} />} */}
             </div>
@@ -202,7 +234,7 @@ export function Chapter({title, sections, id}) {
     )
 }
 
-export function Section({title, chp_id, id}) {
+export function Section({title, chp_id, id}: SectionProps) {
     const nav = useNavigate()
 
     const onSectionClick = () => {
@@ -213,21 +245,21 @@ export function Section({title, chp_id, id}) {
         nav(`${path}id?chp=${chp_id}&sec=${id}`)
     }
     return (
-        <p draggable='false' onClick={onSectionClick} className={styles.Item}>{title}</p>
+        <p onClick={onSectionClick} className={styles.Item}>{title}</p>
     )
 }
 
-function SectionField({index, id, remove, value, onDragOver, onDragStart, onDrop, OnDragEnd}) {
+function SectionField({index, id, remove, value, onDragOver, onDragStart, onDrop, OnDragEnd}: SectionFieldProps) {
     return (
         <div data-index={index} draggable='true' onDragEnd={OnDragEnd} onDrop={onDrop} onDragStart={onDragStart} onDragOver={onDragOver}>
             <InputField tempvalue={value} data_index={index} customStyle={{backgroundColor: '#DDD'}} label={`Section ${index}`}>
-                <FaDeleteLeft onClick={e=>remove(id)} color='red' size={'1.5rem'} className={styles.Remove}/>
+                <FaDeleteLeft onClick={remove?remove(id):undefined} color='red' size={'1.5rem'} className={styles.Remove}/>
             </InputField>
         </div>
     )
 }
 
-function Empty({value}){
+function Empty({value}: {value: string}){
     return (
         <div className={styles.Empty}>
         <InputField label={value} />
@@ -235,7 +267,7 @@ function Empty({value}){
     )
 }
 
-function EmptySection({title}){
+function EmptySection({title}: {title: string}){
     return (
         <p className={styles.Item}>{title}</p>
     )

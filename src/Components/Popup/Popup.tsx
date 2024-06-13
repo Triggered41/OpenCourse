@@ -1,10 +1,20 @@
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
 
 import popupStyles from './popup.module.css'
 import buttonStyles from '../Button/ButtonStyles.module.css'
+import { ReactNode, RefObject } from 'react'
 
-export function PopupCard({setPopup, eleRef, children, isVisible}) {
+interface PopupCardProps{
+    setPopup?: Function | undefined,
+    eleRef?: RefObject<HTMLDivElement>,
+    children?: ReactNode,
+    isVisible?: boolean
+}
+
+
+export function PopupCard({setPopup, eleRef, children, isVisible}: PopupCardProps) {
     function close() {
+        if (!setPopup) return
         setPopup(false)
     }
 

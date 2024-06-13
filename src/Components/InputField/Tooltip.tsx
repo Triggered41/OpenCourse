@@ -1,6 +1,6 @@
 import styles from './Tooltip.module.css';
 
-export function Tooltip({isFocused, rules}) {
+export function Tooltip({isFocused, rules}: {isFocused: boolean, rules: Array<boolean>}) {
     return ( 
         <div className={styles.Tooltip}>
             { !rules[5] &&

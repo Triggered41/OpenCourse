@@ -1,36 +1,36 @@
-import { useRef, useState } from "react"
+import { DragEvent, ReactNode, RefObject, useRef, useState } from "react"
 import styles from './Draggable.module.css'
-import img from '../BGTeddy.png'
+// import img from '../BGTeddy.png'
 
-export function Draggable({ Items, Decoy }){
-    const okref = useRef()
-    const temp = Items.map((val, i)=>{
+export function Draggable({ Items, Decoy }: {Items: any, Decoy: ReactNode}){
+    const okref: RefObject<HTMLDivElement> = useRef(null)
+    const temp = Items.map((val: ReactNode, i: Number)=>{
         return {id: i, index: i, value: val}
     })
-    const[itemList, setItemList] = useState(temp)
-    const[keyIndex, setKeyIndex] = useState(Items.length)
+    const[itemList, setItemList]: any = useState(temp)
+    const[keyIndex, setKeyIndex]: any = useState(Items.length)
     
-    const[heldItem, setHeldItem] = useState()
-    const[empty, setEmpty] = useState({id:-1})
+    const[heldItem, setHeldItem]: any = useState()
+    const[empty, setEmpty]: any = useState({id:-1})
 
     // When an element is grabbed (ev is the grabbed element)
-    const onDragStart = (ev) => {
+    const onDragStart = (ev: DragEvent<HTMLDivElement>) => {
         console.log("Start: ", ev.target)
-        const index = ev.target.dataset.index;
+        const index = ev.currentTarget.dataset.index;
         setHeldItem({
             index: index,
-            value: itemList.find((val)=>val.index == index)
+            value: itemList.find((val:AnyObject)=>val.index == index)
             })  
 
-        okref.current.innerHTML = ev.currentTarget.getElementsByTagName('h2')[0].innerHTML
-        ev.dataTransfer.setDragImage(okref.current, 0, 0)
+        okref.current!.innerHTML = ev.currentTarget.getElementsByTagName('h2')[0].innerHTML
+        ev.dataTransfer.setDragImage(okref.current!, 0, 0)
     }
 
     // Whenever the grabbed element moves on top of another element (e is the the element already in place)
     const[overlapElement, setOverlapElement] = useState()
-    const onDragOver = (e) => {
+    const onDragOver = (e: DragEvent<HTMLElement>) => {
         e.preventDefault()
-        var index = e.currentTarget.dataset.index
+        var index: any = e.currentTarget.dataset.index
         console.log("Over: ", index)
         if (index != undefined && overlapElement != index){
             index = parseInt(index)
@@ -47,13 +47,13 @@ export function Draggable({ Items, Decoy }){
         }
     }
 
-    const onDrop = (ev) => {
-        ev.preventDefault()
-        console.log("Drop")
-    }
+    // const onDrop = (ev: MouseEvent) => {
+    //     ev.preventDefault()
+    //     console.log("Drop")
+    // }
 
     // When let go of grabbed element
-    const OnDragEnd = (ev) => {
+    const OnDragEnd = () => {
         var temp = [...itemList]
         temp = temp.filter(val=>val.id!=empty.id)
         temp = temp.filter(val=>val.index!=heldItem.index)
@@ -76,7 +76,7 @@ export function Draggable({ Items, Decoy }){
 
     return (
         <div>
-            {itemList.map((item, i)=>
+            {itemList.map((item: AnyObject)=>
                 item.type ? Decoy :
                 <div
                     key={item.id}

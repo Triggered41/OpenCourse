@@ -1,9 +1,18 @@
 import styles from './Card.module.css';
 import img from '../1080archy.png';
-import { getApi } from '../../APIHandler/apiHandler';
+// import { getApi } from '../../APIHandler/apiHandler.tsx';
 import { useNavigate } from 'react-router-dom';
+import { CSSProperties } from 'react';
 
-export function Card({Title = "Title", Description = "Temp paragraph", Image=img, style, onCardClick}) {
+interface CardProps{
+    Title?: string,
+    Description?: string,
+    Image?: string,
+    style?: CSSProperties|undefined,
+    onCardClick?: (event: React.MouseEvent) => void
+}
+
+export function Card({Title = "Title", Description = "Temp paragraph", Image=img, style, onCardClick}: CardProps) {
     const nav = useNavigate()
 
     const onCourseClick = () => {

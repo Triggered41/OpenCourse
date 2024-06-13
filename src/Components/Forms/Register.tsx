@@ -1,17 +1,17 @@
 import styles from './Form.module.css'
 import ErrorAnim from './error_anim.module.css'
-import { useEffect, useRef, useState } from "react"
+import { RefObject, useRef, useState } from "react"
 import { onFieldChange } from '../InputField/inputFieldAnim';
 import { Link } from 'react-router-dom';
-import { postApi } from '../../APIHandler/apiHandler';
-import Bar from '../NavBar/NavBar';
+import { postApi } from '../../APIHandler/apiHandler.tsx';
+import Bar from '../NavBar/NavBar.tsx';
 import { InputField } from '../InputField/InputField';
-import { Tooltip } from '../InputField/Tooltip';
+import { Tooltip } from '../InputField/Tooltip.tsx';
 
-export function RegisterForm(params) {
-    const passRef = useRef();
-    const submitRef = useRef();
-    const errRef = useRef();
+export function RegisterForm() {
+    const passRef: RefObject<HTMLInputElement> = useRef(null);
+    const submitRef: any = useRef(null);
+    const errRef: RefObject<HTMLParagraphElement> = useRef(null);
 
     const [name, setName] = useState('');
     const [userName, setUserName] = useState('');
@@ -31,7 +31,7 @@ export function RegisterForm(params) {
         setIsFocus(false)
     }
 
-    const onPassChange = (val, set, ref, submitRef) => {
+    const onPassChange: any = (val: string, set:Function, ref: RefObject<HTMLElement>, submitRef:RefObject<HTMLButtonElement>) => {
         onFieldChange(val, set, ref, submitRef)
         var temp = [false, false, false, false]
         temp[0] = val.length >= 8
@@ -47,9 +47,9 @@ export function RegisterForm(params) {
         setErr(errArr);
     }
 
-    const onSubmit = (ev)=>{
+    const onSubmit = (ev: SubmitEvent)=>{
         ev.preventDefault();
-        errRef.current.classList.remove(ErrorAnim.Error)
+        errRef.current!.classList.remove(ErrorAnim.Error)
 
         const flags = "gm";
         const pattern = /[A-Za-z0-9._%+\-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/
@@ -62,9 +62,9 @@ export function RegisterForm(params) {
         
         setErr(errArr)
         pass !== cPass ? setErrMsg("Passwords don't match") : !rule[5] ? setErrMsg("Password isn't strong enough") : ''
-        submitRef.current.disabled = pass !== cPass || !rule[5]
+        submitRef.current!.disabled = pass !== cPass || !rule[5]
         if (pass !== cPass || !rule[5]){
-            errRef.current.classList.add(ErrorAnim.Error)
+            errRef.current!.classList.add(ErrorAnim.Error)
             return;
         }
         
@@ -88,7 +88,7 @@ export function RegisterForm(params) {
     return (
         <>
         <Bar />
-        <form className={styles.Form} onSubmit={onSubmit}>
+        <form className={styles.Form} onSubmit={(e:any)=>onSubmit(e)}>
             <p ref={errRef} style={{position: 'absolute', top: '5rem', color: 'red'}}>{errMsg}</p>
             <div className={styles.InputHolder}>
                 <h1 className={styles.Title}>Register</h1>

@@ -52,3 +52,17 @@
     transform: scale(1.05);
     outline: solid #e99f9ff0 5px;
 }
+
+.Edit{
+    padding: 0.25rem;
+    /* background-color: whites; */
+}
+
+.Edit:hover{
+    scale: 1.05;
+    box-shadow: #00000080 1px 1px 3px;
+}
+
+.Edit:active{
+    scale: 0.95;
+}

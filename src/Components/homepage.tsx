@@ -2,16 +2,15 @@ import styles from './HomePage.module.css'
 import img from './1080archy.png'
 import img1 from './BGTeddy.png'
 
-import { Link, useNavigate } from "react-router-dom"
-import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from "react-router-dom"
 import Bar from './NavBar/NavBar'
-import { ImgTextSection } from './ImgTextSection'
+import { ImgTextSection } from './ImgTextSection.tsx'
 import { Card } from './Card/Card'
 import Footer from './Footer'
 
-const url = 'http://localhost:3300/';
+// const url = 'http://localhost:3300/';
 
-export function HomePage(params) {
+export function HomePage() {
     return (
         <>
         <Bar />
@@ -27,23 +26,23 @@ export function HomePage(params) {
 
 // Chaging the BG Image
 var imgIndex = 0;
-var interval = null
-const change_image = () =>{
+var interval:ReturnType<typeof setInterval>|undefined = undefined
+const change_image:Function = () =>{
     const images = [img1, img];
     interval = setInterval(() => {
         if (window.location.pathname != '/'){
             clearInterval(interval)
             return
         }
-        const ele = document.querySelector(`.${styles.ShowCase}`);
+        const ele:HTMLElement = document.querySelector(`.${styles.ShowCase}`) as HTMLElement;
         ele.style.backgroundImage = `url(${images[imgIndex]})`
         imgIndex = (imgIndex+1)%images.length;
     }, 5000);
 }
-clearInterval(interval);
 window.onload = change_image();
+clearInterval(interval);
 
-export function ShowCase(params) {
+export function ShowCase() {
     const nav = useNavigate();
 
     const onClick = ()=>{
@@ -61,7 +60,7 @@ export function ShowCase(params) {
     )
 }
 
-export function Grid(params) {
+export function Grid() {
     return (
         <div className={styles.Grid}>
             <Card />

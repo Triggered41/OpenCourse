@@ -7,17 +7,17 @@ import img from '../BGTeddy.png';
 import addImg from '../Course/AddImg.png'
 import Bar from '../NavBar/NavBar';
 import { Card } from '../Card/Card';
-import { useEffect, useRef, useState } from 'react';
-import { postApi } from '../../APIHandler/apiHandler';
-import Footer from '../Footer';
-import { checkLogin } from '../../APIHandler/checkLogin';
+import { useEffect, useState } from 'react';
+import { postApi } from '../../APIHandler/apiHandler.tsx';
+import Footer from '../Footer.tsx';
+import { checkLogin } from '../../APIHandler/checkLogin.tsx';
 import { useNavigate, useParams } from 'react-router-dom';
-import { onFieldChange } from '../InputField/inputFieldAnim';
+// import { onFieldChange } from '../InputField/inputFieldAnim';
 import { InputField } from '../InputField/InputField';
 import { PopupCard } from '../Popup/Popup';
 
 
-export function Profile(props) {
+export function Profile() {
     const[name, setName] = useState('My Name')
     const[userName, setUserName] = useState('@My User Name')
     const[email, setEmail] = useState('My Email')
@@ -86,7 +86,7 @@ export function Profile(props) {
                     Description='Click To create a new course' 
                     Image={addImg}
                 />}
-                {courses.map((val, i)=>{
+                {courses.map((val:any, i)=>{
                     return <Card key={i} Title={val.Name} Description={val.Intro} Image={val.img}/>
                 })}
             </div>

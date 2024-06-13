@@ -1,5 +1,6 @@
-import { useState } from "react"
-import { Draggable } from "./Draggable"
+// import { useState } from "react"
+import { ReactNode } from "react"
+import { Draggable } from "./Draggable.tsx"
 
 export function DragMenu(){
     var list = [
@@ -13,7 +14,7 @@ export function DragMenu(){
     )
 }
 
-function Here({ msg }){
+function Here({ msg } : {msg: ReactNode}){
     return (
         <h3 style={{backgroundColor: 'palevioletred'}}>{msg}</h3>
     )

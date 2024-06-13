@@ -1,7 +1,14 @@
 import styles from './ImgTextSection.module.css'
 import img from './1080archy.png'
 
-export function ImgTextSection({title, text, quotes, image=img}){
+interface ImgTextSectionProps{
+    title: string,
+    text: string,
+    quotes?: boolean,
+    image?: string
+}
+
+export function ImgTextSection({title, text, quotes, image=img}: ImgTextSectionProps){
     return (
         <div className={styles.About}>
             <div className={styles.ImgHolder}>
