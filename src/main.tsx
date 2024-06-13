@@ -11,7 +11,7 @@ import { HomePage } from './Components/homepage.tsx';
 import { CoursePage } from './Components/Course/CoursePage.tsx';
 import { Course } from './Components/Course/Course.tsx';
 // import { Test } from './Components/Course/test';
-// import { PageCreator } from './Components/Creator/PageCreator.tsx';
+import { PageCreator } from './Components/Creator/PageCreator.tsx';
 import { Profile } from './Components/Profile/Profile.tsx';
 // import { Card } from './Components/Card/Card.tsx';
 // import { InputField } from './Components/InputField/InputField.tsx';
@@ -52,7 +52,7 @@ const router = createBrowserRouter([
   },
   {
     path: 'user/:Profile/PageCreator',
-    // element: <PageCreator />
+    element: <PageCreator />
   },
   {
     path: '/test',

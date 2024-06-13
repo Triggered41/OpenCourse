@@ -84,3 +84,14 @@
 //   </div>
 //   )
 // }
+
+import { useState } from 'react';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import styles from './Page.module.css'
+
+export function PageCreator() {
+  const [value, setValue] = useState('');
+
+  return <ReactQuill className={styles.Editor} theme="snow" value={value} onChange={setValue} />;
+}
