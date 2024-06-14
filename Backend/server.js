@@ -16,7 +16,7 @@ const __dirname = path.resolve();
 
 app.use(express.static(join(__dirname, 'dist')))
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: 'http://192.168.1.5:5173',
     credentials: true,
 }))
 app.use(session({ secret: 'wingsofpidgeon', saveUninitialized: true, resave: true}))
@@ -135,6 +135,6 @@ app.use('*', (req, res)=>{
     res.sendFile(join(__dirname, 'dist/index.html'))
 })
   
-app.listen(3300, "localhost", ()=>{
+app.listen(3300, "192.168.1.5", ()=>{
     console.log("Server Started at 3300");
 })

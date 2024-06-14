@@ -30,6 +30,7 @@
 }
 
 .TypeField{
+    touch-action: none;
     grid-row-start: 1;
     grid-column-start: 1;
     border: none;

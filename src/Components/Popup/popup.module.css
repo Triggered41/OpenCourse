@@ -102,3 +102,8 @@
     
 }
 
+@media screen and (max-width: 600px) {
+    .Popup{
+        width: 100%;
+    }
+}

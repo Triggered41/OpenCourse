@@ -1,5 +1,5 @@
-const URLS = "http://localhost:3300/api/";
-const URL = "http://localhost:3300/api";
+const URLS = "http://192.168.1.5:3300/api/";
+const URL = "http://192.168.1.5:3300/api";
 
 var options: ObjectX = {
     mode: 'cors',

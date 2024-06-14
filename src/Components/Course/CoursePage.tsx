@@ -7,7 +7,7 @@ import Bar from "../NavBar/NavBar.tsx"
 import addImg from './AddImg.png'
 
 import { ImgTextSection } from '../ImgTextSection.tsx'
-import { DragEvent, DragEventHandler, MouseEvent, RefObject, useEffect, useRef, useState } from 'react'
+import { MouseEvent, RefObject, useEffect, useRef, useState } from 'react'
 import Footer from '../Footer.tsx'
 import { useNavigate } from 'react-router-dom'
 // import { url } from '../URL'
@@ -15,13 +15,16 @@ import { postApi } from '../../APIHandler/apiHandler.tsx'
 import { PopupCard } from '../Popup/Popup.tsx'
 import { InputField } from '../InputField/InputField'
 import { FaDeleteLeft } from 'react-icons/fa6'
-import { Draggable } from '../Draggable/Draggable.tsx'
 import { FaRegEdit } from 'react-icons/fa'
+import { DndContext, DragEndEvent, PointerSensor, TouchSensor, UniqueIdentifier, closestCorners, useSensor, useSensors } from '@dnd-kit/core'
+import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 interface ChapterProps{
     title: string,
     sections: AnyObject,
-    id: Number|string,
+    chapter: Number,
+    id: UniqueIdentifier,
     setPopup: Function
 }
 
@@ -33,13 +36,8 @@ interface SectionProps{
 
 interface SectionFieldProps{
     index?: any,
-    id?: Number,
+    id: UniqueIdentifier,
     remove?: Function
-    value?: string,
-    onDragOver?: DragEventHandler<HTMLDivElement>,
-    onDragStart?: DragEventHandler<HTMLDivElement>,
-    onDrop?: DragEventHandler<HTMLDivElement>,
-    OnDragEnd?: DragEventHandler<HTMLDivElement>
 }
 
 const getCourse = async () => {
@@ -80,30 +78,34 @@ export function CoursePage() {
     )
 }
 
-var keyIndex = 0
+// id of dndkit's sortable items can't be zero so keep it at least 1
+var keyIndex = 1 
 export function Course({chaps}:{chaps:Array<any>}) {
     
-    const[sections, setSections]: any = useState([])
+    const[sections, setSections] = useState<Array<any>>([])
     const[popup, setPopup] = useState(false)
+
+    const[chapters, setChapters]: any = useState([])
+
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 0.1 // Delay if .1s to distinguish b/w click n drag
+              }
+        }),
+        useSensor(TouchSensor)
+    )
     
-    const[heldItem, setHeldItem]: any = useState()
-    const[empty, setEmpty] = useState<ObjectX>({id:-1})
-
-    const[chapters, setChapters]: any = useState()
-    // const chapters = chaps.map(chp=>(
-    //         <Chapter key={chp.id} id={chp.id} title={chp.Name} sections={chp.Sections}/>
-    //     ))
-
     useEffect(()=>{
         if (chaps.length > 0){
-            const temp: JSX.Element[] = chaps.map(chp=>(
-                <Chapter setPopup={setPopup} key={chp.id} id={chp.id} title={chp.Name} sections={chp.Sections}/>
-            ))
-            console.log("Chapters: ", chaps)
-            console.log("Temp: ", temp)
-            setChapters(temp)
+        const temp = chaps.map(chp=>{
+            return {id: chp.id+1, Chapter: chp.id, Title: chp.Name, Sections: chp.Sections}
+        })
+        console.log('tempL ', temp)
+        setChapters(temp)
         }
-    }, [chaps])
+
+    },[chaps])
     
     const addChapter = () => {
         setPopup(true)
@@ -123,93 +125,82 @@ export function Course({chaps}:{chaps:Array<any>}) {
         setSections(temp)
     }
 
-    // When an element is grabbed (ev is the grabbed element)
-    const onDragStart = (ev:DragEvent<HTMLDivElement>) => {
-        console.log("Start: ", ev.target)
-        setHeldItem({
-            index: ev.currentTarget!.dataset.index,
-            value: ev.currentTarget.getElementsByTagName('input')[0].value})
-        console.log("grabbed: ", ev.currentTarget.dataset.index, ', ', ev.currentTarget.getElementsByTagName('input')[0].value)
+    const onDragEnd = (ev: DragEndEvent, type?: string) => {
+        const { active, over } = ev
+        if (active.id === over?.id) return;
 
-    }
+        var temp = (array: any) => {
+            const activeID = array.findIndex((sec: any)=>sec.id==active.id)
+            const overID = array.findIndex((sec: any)=>sec.id==over?.id)
+            console.log(activeID, ' : ', overID)
+            return arrayMove(array, activeID, overID)
+        }
 
-    const[overlapElement, setOverlapElement] = useState()
-    // Whenever the grabbed element moves on top of another element (e is the the element already in place)
-    const onDragOver = (ev: DragEvent<HTMLDivElement>) => {
-        ev.preventDefault()
-        var index: any = ev.currentTarget.dataset.index
-        if (index != undefined && overlapElement != index){
-            index = parseInt(index)
-            setOverlapElement(index)
-            var temp = [...sections]
-            const element = {id:keyIndex++, index: index, type: 'Empty', value:heldItem.value}
-            temp = temp.filter(val=>val.id!=empty.id)
-            temp.splice(index, 0, element)
+        if (type){
+            setChapters(temp)
 
-            // console.log(temp)
-            setEmpty(element)
+        }else{
             setSections(temp)
         }
     }
 
-    // When let go of grabbed element
-    const onDragEnd = () => {
-        var temp = [...sections]
-        temp = temp.filter(val=>val.id!=empty.id)
-        temp = temp.filter(val=>val.index!=heldItem.index)
-        const element = {id: keyIndex++, index: empty.index, value: heldItem.value}
-        temp.splice(empty.index, 0, element)
-
-        temp.forEach((ele, i)=>{
-            ele.index = i;
-        })
-
-        setEmpty({id:-1})
-        setHeldItem({index: -1, value:''})
-        console.log("ENDED: ", temp)
-        setSections(temp)
-    }
-
     return (
         <div>
-            {chapters?<Draggable Items={chapters} Decoy={<EmptySection key={(keyIndex++)+10} title={'Drop Here?'}/>} />:''}
-            {/* {chaps.map(chp=>(
-                <Chapter key={chp.id} id={chp.id} title={chp.Name} sections={chp.Sections}/>
-            ))} */}
+            
+            <DndContext sensors={sensors} onDragEnd={e=>onDragEnd(e, 'chapters')} collisionDetection={closestCorners}>
+            <SortableContext items={chapters} strategy={verticalListSortingStrategy}>
+            {chapters.map((chapter: any)=>
+                <Chapter key={chapter.id} chapter={chapter.Chapter} setPopup={setPopup} id={chapter.id} title={chapter.Title} sections={chapter.Sections}/>
+            )}
+            </SortableContext>
+            </DndContext>
+
             <div onClick={addChapter} className={styles.Section}>
                 <h2 className={styles.Title}><img className={styles.AddImg} src={addImg} alt="" /></h2>
             </div>
+
             <PopupCard isVisible={popup} setPopup={setPopup}>
-            <form className={styles.Form}>
-                <InputField customStyle={{backgroundColor: '#DDD'}} label={'Chapter Name'}/>
-                {
-                    sections.map((val: any) => 
-                        val.type ? <Empty value={val.value} key={val.id}/> : <SectionField value={val.value} OnDragEnd={onDragEnd} onDragOver={onDragOver} onDragStart={onDragStart} key={val.id} id={val.id} index={val.index} remove={removeSection}/>
-                    )
-                }
-                <h2 onClick={addSection} draggable='false' className={styles.Title}><img draggable='false' className={styles.AddImg} src={addImg} alt="" /></h2>
-                
-                <center>
-                <input className={buttonStyles.PrimaryButton} type="submit" value="Confirm" />
-                </center>
-            </form>
+                <form className={styles.Form}>
+                    <InputField customStyle={{backgroundColor: '#DDD'}} label={'Chapter Name'}/>
+                    
+                    <DndContext sensors={sensors} onDragEnd={onDragEnd} collisionDetection={closestCorners}>
+                        <SortableContext items={sections} strategy={verticalListSortingStrategy}>
+                        {
+                        sections.map((val: any) => 
+                            <SectionField key={val.id} id={val.id} index={val.index} remove={removeSection}/>
+                        )}
+                        </SortableContext>
+                    </DndContext>
+
+                    <h2 onClick={addSection} draggable='false' className={styles.Title}><img draggable='false' className={styles.AddImg} src={addImg} alt="" /></h2>
+                    
+                    <center>
+                        <input className={buttonStyles.PrimaryButton} type="submit" value="Confirm" />
+                    </center>
+
+                </form>
             </PopupCard>
+            
         </div>
     )
 }
 
 
-export function Chapter({title, sections, id, setPopup}: ChapterProps) {
+export function Chapter({title, sections, id, chapter, setPopup}: ChapterProps) {
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
+
     const ele: RefObject<HTMLDivElement> = useRef(null);
     const symbol: RefObject<HTMLHeadingElement> = useRef(null);
     const [isOpen, setIsOpen] = useState(false);
 
+    console.log("Chp: ", chapter)
     const items = (sections.map((item: any, i: any)=>(
-        <Section key={i} chp_id={id} id={i} title={item.Name+': '+(item.Content??'')}/>
+        <Section key={i} chp_id={chapter} id={i} title={item.Name+': '+(item.Content??'')}/>
     )))
 
     
     const onClick = () => {
+        console.log("HELO")
         ele.current!.style.height = isOpen ? '0px' : (items.length*47)+'px';
         symbol.current!.setAttribute("data-symbol", isOpen ? ' ▸' : '    ▾');
         console.log(id)
@@ -220,15 +211,24 @@ export function Chapter({title, sections, id, setPopup}: ChapterProps) {
         setPopup(true)
     }
 
+    const style = {
+        transition,
+        transform: CSS.Transform.toString(transform),
+    };
+
+    useEffect(()=>{
+        console.log("ID: ", id)
+    }, [])
+
+
     return (
-        <div className={styles.Section}>
+        <div ref={setNodeRef} {...attributes} {...listeners} style={style} className={styles.Section}>
             <div className={styles.box} onClick={onClick}>
                 <FaRegEdit onClick={onEditClick} className={buttonStyles.Edit}/>
                 <h2 ref={symbol} data-symbol=" ▸" className={styles.Title}>{title}</h2>
             </div>
             <div ref={ele} className={styles.List}>
                 {items}
-                {/* {<Draggable Items={items} Decoy={<EmptySection key={(keyIndex++)+10} title={'Drop Here?'}/>} />} */}
             </div>
         </div>
     )
@@ -249,26 +249,31 @@ export function Section({title, chp_id, id}: SectionProps) {
     )
 }
 
-function SectionField({index, id, remove, value, onDragOver, onDragStart, onDrop, OnDragEnd}: SectionFieldProps) {
+function SectionField({id, index, remove}: SectionFieldProps) {
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
+
+    const style = {
+        transition,
+        transform: CSS.Transform.toString(transform),
+    };
+
+    useEffect(()=>{
+        console.log("ID: ", id)
+    }, [])
+
+
     return (
-        <div data-index={index} draggable='true' onDragEnd={OnDragEnd} onDrop={onDrop} onDragStart={onDragStart} onDragOver={onDragOver}>
-            <InputField tempvalue={value} data_index={index} customStyle={{backgroundColor: '#DDD'}} label={`Section ${index}`}>
-                <FaDeleteLeft onClick={remove?remove(id):undefined} color='red' size={'1.5rem'} className={styles.Remove}/>
+        <div ref={setNodeRef} {...attributes} {...listeners} style={style}>
+            <InputField customStyle={{backgroundColor: '#DDD'}} label={`Section ${index}`}>
+                <FaDeleteLeft onClick={()=>remove?remove(id):undefined} color='red' size={'1.5rem'} className={styles.Remove}/>
             </InputField>
         </div>
     )
 }
 
-function Empty({value}: {value: string}){
-    return (
-        <div className={styles.Empty}>
-        <InputField label={value} />
-        </div>
-    )
-}
 
-function EmptySection({title}: {title: string}){
-    return (
-        <p className={styles.Item}>{title}</p>
-    )
-}
+// function EmptySection({title}: {title: string}){
+//     return (
+//         <p className={styles.Item}>{title}</p>
+//     )
+// }
