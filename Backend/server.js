@@ -1,4 +1,4 @@
-import { register, login, saveCourse, loadCourse, getChapter, getChapters, getSection, getSections, getUser, getCourse, createCourse, updateUser } from './dbconn.js';
+import { register, login, saveCourse, loadCourse, getChapter, getChapters, getSection, getSections, getUser, getCourse, createCourse, updateUser, deleteCourse } from './dbconn.js';
 
 import { join } from 'path';
 import cors from 'cors';
@@ -16,13 +16,12 @@ const __dirname = path.resolve();
 
 app.use(express.static(join(__dirname, 'dist')))
 app.use(cors({
-    origin: 'http://192.168.1.5:5173',
+    origin: ['http://192.168.1.5:5173', 'http://localhost:5173'],
     credentials: true,
 }))
 app.use(session({ secret: 'wingsofpidgeon', saveUninitialized: true, resave: true}))
 app.use(cookieParser())
 app.use(express.json())
-
 
 app.use('/api/register', (req, res) => {
     const user = req.body;
@@ -51,6 +50,7 @@ app.use('/api/login', (req, res) => {
             jwt.sign({user: data.UserName}, "wingsofpidgeon", {expiresIn: '10m'}, (err, token) => {
                 if (err) throw err;
                 console.log("Login successful: ", data);
+                console.log("Token generated: ", token);
                 res.cookie('token', token, {maxAge: 600000})
                 res.json({UserName: data.UserName})
             })
@@ -89,6 +89,12 @@ app.post('/api/SaveCourse',(req, res) => {
         req.session.courseID = id;
         res.json("Done: " + req.session.courseID);
     })
+})
+
+app.delete('/api/DeleteCourse/:Course', auth, (req, res) => {
+    console.log("Deleting:", req.data.user+ "'s Course",req.params.Course)
+    deleteCourse(req.data.user, req.params.Course)
+    
 })
 
 app.use('/api/loadCourse', (req, res) => {

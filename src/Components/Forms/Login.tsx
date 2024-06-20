@@ -23,12 +23,14 @@ export function LoginForm() {
     }, [])
 
     const onSubmit = (ev: SubmitEvent)=>{
+        console.log("OKOKOKOKOK")
         ev.preventDefault();
         errRef.current!.classList.remove(ErrorAnim.Error)
         postApi('login', {User: user, Password: pass})
         .then(res => res.json())
-        .then(data => {
-            console.log(data)
+        .then((data:any) => {
+            console.log("Data: ", data)
+            console.log("Token: ", document.cookie)
             setToken(data.token);
             if (data.UserName){
                 nav(`/user/${data.UserName}`)

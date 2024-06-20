@@ -24,6 +24,9 @@ interface ChapterProps{
     title: string,
     sections: AnyObject,
     chapter: Number,
+    setSections: Function,
+    setChapterName: Function,
+    setIsUpdate: Function,
     id: UniqueIdentifier,
     setPopup: Function
 }
@@ -35,8 +38,9 @@ interface SectionProps{
 }
 
 interface SectionFieldProps{
-    index?: any,
     id: UniqueIdentifier,
+    index?: any,
+    tempValue?: string,
     remove?: Function
 }
 
@@ -86,6 +90,9 @@ export function Course({chaps}:{chaps:Array<any>}) {
     const[popup, setPopup] = useState(false)
 
     const[chapters, setChapters]: any = useState([])
+    const[chapterName, setChapterName]: any = useState()
+
+    const[isUpdate, setIsUpdate] = useState([false])
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -99,6 +106,7 @@ export function Course({chaps}:{chaps:Array<any>}) {
     useEffect(()=>{
         if (chaps.length > 0){
         const temp = chaps.map(chp=>{
+            console.log(chp.Sections)
             return {id: chp.id+1, Chapter: chp.id, Title: chp.Name, Sections: chp.Sections}
         })
         console.log('tempL ', temp)
@@ -107,12 +115,60 @@ export function Course({chaps}:{chaps:Array<any>}) {
 
     },[chaps])
     
-    const addChapter = () => {
+    const openAddChapterPopup = () => {
         setPopup(true)
+        setSections([])
+        setIsUpdate([false])
+    }
+
+    const addChapter = (currentChapters: any) => {
+        const inputs = document.getElementsByTagName('input')
+        const temp = [...sections]
+        temp.forEach((val, i)=>{
+            val.Name = inputs[i+1].value
+        })
+        currentChapters.push({id:keyIndex++, Title: chapterName, Chapter: chapters.length+1, Sections: [...sections]})
+        setChapters(currentChapters)
+        console.log("Sections: ", sections)
+    }
+    const updateChapter = (index: number) => {
+
+        
+        const inputs = document.getElementsByTagName('input')
+        const temp_chapters = [...chapters]
+        const temp_sections = [...sections]
+        
+        temp_sections.forEach((val, i)=>{
+            val.Name = inputs[i+1].value
+        })
+    
+        // temp_sections.forEach((val:any)=>{
+        //     console.log("AS: ", val)
+        // })
+        temp_chapters[index].Title = chapterName;
+        temp_chapters[index].Sections = temp_sections;
+        setChapters(temp_chapters)
+        
+        
+    }
+
+    const onCourseEdit = (event: SubmitEvent) => {
+        event.preventDefault()
+        
+        const temp = [...chapters]
+        console.log("IS up: ", isUpdate)
+        if (isUpdate[0]){
+            const index = chapters.findIndex((val:any)=>val.Title === isUpdate[1])
+            console.log('Index: ', index)
+            updateChapter(index)
+        }else{
+            addChapter(temp)
+        }
+        console.log("Chapters: ", chapters)
+        
     }
     
     const addSection = () => {
-        console.log("OK: ", keyIndex)
         const temp = [...sections, {id: keyIndex++, index: sections.length}]
         setSections(temp)
 
@@ -150,24 +206,24 @@ export function Course({chaps}:{chaps:Array<any>}) {
             <DndContext sensors={sensors} onDragEnd={e=>onDragEnd(e, 'chapters')} collisionDetection={closestCorners}>
             <SortableContext items={chapters} strategy={verticalListSortingStrategy}>
             {chapters.map((chapter: any)=>
-                <Chapter key={chapter.id} chapter={chapter.Chapter} setPopup={setPopup} id={chapter.id} title={chapter.Title} sections={chapter.Sections}/>
+                <Chapter setIsUpdate={setIsUpdate} setChapterName={setChapterName} key={chapter.id} chapter={chapter.Chapter} setPopup={setPopup} id={chapter.id} title={chapter.Title} sections={chapter.Sections} setSections={setSections}/>
             )}
             </SortableContext>
             </DndContext>
 
-            <div onClick={addChapter} className={styles.Section}>
+            <div onClick={openAddChapterPopup} className={styles.Section}>
                 <h2 className={styles.Title}><img className={styles.AddImg} src={addImg} alt="" /></h2>
             </div>
 
             <PopupCard isVisible={popup} setPopup={setPopup}>
-                <form className={styles.Form}>
-                    <InputField customStyle={{backgroundColor: '#DDD'}} label={'Chapter Name'}/>
+                <form onSubmit={(e:any)=>onCourseEdit(e)} className={styles.Form}>
+                    <InputField value={chapterName} tempvalue={chapterName} set={setChapterName} customStyle={{backgroundColor: '#DDD'}} label={'Chapter Name'}/>
                     
                     <DndContext sensors={sensors} onDragEnd={onDragEnd} collisionDetection={closestCorners}>
                         <SortableContext items={sections} strategy={verticalListSortingStrategy}>
                         {
                         sections.map((val: any) => 
-                            <SectionField key={val.id} id={val.id} index={val.index} remove={removeSection}/>
+                            <SectionField key={val.id} id={val.id} index={val.index} tempValue={val.Title} remove={removeSection}/>
                         )}
                         </SortableContext>
                     </DndContext>
@@ -186,7 +242,7 @@ export function Course({chaps}:{chaps:Array<any>}) {
 }
 
 
-export function Chapter({title, sections, id, chapter, setPopup}: ChapterProps) {
+export function Chapter({title, sections, setSections, setChapterName, setIsUpdate, id, chapter, setPopup}: ChapterProps) {
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
 
     const ele: RefObject<HTMLDivElement> = useRef(null);
@@ -208,6 +264,13 @@ export function Chapter({title, sections, id, chapter, setPopup}: ChapterProps) 
     }
     const onEditClick = (ev: MouseEvent|TouchEvent) => {
         ev.stopPropagation()
+        const temp: AnyObject = sections.map((sec:any, i:Number)=>{
+            return {id: keyIndex++, Title: sec.Name, index: i}
+        })
+        
+        setIsUpdate([true, title])
+        setChapterName(title)
+        setSections(temp)
         setPopup(true)
     }
 
@@ -215,11 +278,6 @@ export function Chapter({title, sections, id, chapter, setPopup}: ChapterProps) 
         transition,
         transform: CSS.Transform.toString(transform),
     };
-
-    useEffect(()=>{
-        console.log("ID: ", id)
-    }, [])
-
 
     return (
         <div ref={setNodeRef} {...attributes} {...listeners} style={style} className={styles.Section}>
@@ -249,7 +307,7 @@ export function Section({title, chp_id, id}: SectionProps) {
     )
 }
 
-function SectionField({id, index, remove}: SectionFieldProps) {
+function SectionField({id, index, tempValue, remove}: SectionFieldProps) {
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
 
     const style = {
@@ -264,7 +322,7 @@ function SectionField({id, index, remove}: SectionFieldProps) {
 
     return (
         <div ref={setNodeRef} {...attributes} {...listeners} style={style}>
-            <InputField customStyle={{backgroundColor: '#DDD'}} label={`Section ${index}`}>
+            <InputField tempvalue={tempValue} customStyle={{backgroundColor: '#DDD'}} label={`Section ${index}`}>
                 <FaDeleteLeft onClick={()=>remove?remove(id):undefined} color='red' size={'1.5rem'} className={styles.Remove}/>
             </InputField>
         </div>

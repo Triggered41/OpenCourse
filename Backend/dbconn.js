@@ -80,6 +80,14 @@ export async function createCourse(name, intro, userID) {
     }
 }
 
+export async function deleteCourse(UserName, CourseName) {
+    const user = await getUser(UserName);
+    const course = await courseModel.findOne({Author: user._id, Name: CourseName}, {_id: 1})
+    const courseStatus = await courseModel.deleteOne({Author: user._id, Name: CourseName})
+    const userStatus = await userModel.updateOne({_id: user._id}, { $pull: { Courses:  course._id}})
+    return courseStatus && userStatus;
+}
+
 export async function saveCourse(Name) {
     if (mongoose.connection){
         

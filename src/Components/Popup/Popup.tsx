@@ -1,8 +1,8 @@
 // import { useEffect, useState } from "react";
 
 import popupStyles from './popup.module.css'
-import buttonStyles from '../Button/ButtonStyles.module.css'
 import { ReactNode, RefObject } from 'react'
+import { CloseButton } from '../Button/Buttons'
 
 interface PopupCardProps{
     setPopup?: Function | undefined,
@@ -28,7 +28,8 @@ export function PopupCard({setPopup, eleRef, children, isVisible}: PopupCardProp
         <div className={popupStyles.BG}>
         
         <div ref={eleRef} className={`${popupStyles.Popup} ${isVisible && popupStyles.Reveal}`}>
-            <button onClick={close} className={buttonStyles.Close}>X</button>
+            <CloseButton onClick={close}/>
+            {/* <button onClick={close} className={buttonStyles.Close}>X</button> */}
             {children}
         </div>
         </div>

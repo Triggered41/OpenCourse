@@ -62,7 +62,7 @@
 }
 
 .Form input:is([type="submit"]):disabled{
-    background-color: #0000;
+    background-color: transparent;
     color: gray;
     outline: solid gray;
 }

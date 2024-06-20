@@ -30,6 +30,16 @@ export async function postApi(url: string, data: object) {
     return res;
 }
 
+export async function deleteApi(url: string) {
+    const res = await fetch(joinURL(url), {
+        mode: 'cors',
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {'content-type': 'application/json'}
+    })
+    return res;
+}
+
 export function setToken(token: string){
     options.headers.Authorization = `Bearer ${token}`
 }

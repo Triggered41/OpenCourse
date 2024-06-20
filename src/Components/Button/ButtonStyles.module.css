@@ -23,6 +23,12 @@
     outline: solid #9fe9a9F0 5px;
 }
 
+.PrimaryButton:disabled{
+    background-color: transparent;
+    color: #444;
+    outline: solid gray;
+}
+
 .Close{
     pointer-events: all;
     position: absolute;
@@ -40,7 +46,7 @@
     font-size: large;
     
     color: white;
-    background-color: hsl(0, 69%, 51%);
+    background-color: #d82c2c;
 
     box-shadow: #00000080 4px 4px 8px;
     
