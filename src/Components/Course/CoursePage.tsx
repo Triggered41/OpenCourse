@@ -1,17 +1,16 @@
 import styles from './CoursePage.module.css'
+import popupStyles from '../Popup/popup.module.css'
 import buttonStyles from '../Button/ButtonStyles.module.css'
 
 import Bar from "../NavBar/NavBar.tsx"
 
-// import img1 from '../BGTeddy.png'
 import addImg from './AddImg.png'
 
 import { ImgTextSection } from '../ImgTextSection.tsx'
 import { MouseEvent, RefObject, useEffect, useRef, useState } from 'react'
 import Footer from '../Footer.tsx'
-import { useNavigate } from 'react-router-dom'
-// import { url } from '../URL'
-import { postApi } from '../../APIHandler/apiHandler.tsx'
+import { useNavigate, useParams } from 'react-router-dom'
+import { getCourse, postApi, updateCourse } from '../../APIHandler/apiHandler.tsx'
 import { PopupCard } from '../Popup/Popup.tsx'
 import { InputField } from '../InputField/InputField'
 import { FaDeleteLeft } from 'react-icons/fa6'
@@ -19,6 +18,8 @@ import { FaRegEdit } from 'react-icons/fa'
 import { DndContext, DragEndEvent, PointerSensor, TouchSensor, UniqueIdentifier, closestCorners, useSensor, useSensors } from '@dnd-kit/core'
 import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { PrimaryButton } from '../Button/Buttons.tsx'
+import { TiThLarge } from 'react-icons/ti'
 
 interface ChapterProps{
     title: string,
@@ -27,6 +28,7 @@ interface ChapterProps{
     setSections: Function,
     setChapterName: Function,
     setIsUpdate: Function,
+    _id: string,
     id: UniqueIdentifier,
     setPopup: Function
 }
@@ -44,18 +46,14 @@ interface SectionFieldProps{
     remove?: Function
 }
 
-const getCourse = async () => {
-    console.log("OK: ", window.location.pathname)
-    const response = await postApi(window.location.pathname, {})
-    const data = await response.json();
-    console.log("data: ", data)
-    return data;
-}
 
 export function CoursePage() {
     const[title, setTitle] = useState('Course Name')
     const[intro, setIntro] = useState('Introduction')
     const[chapters, setChapters]: Array<any> = useState([])
+
+    const[popup, setPopup] = useState(false)
+    const params = useParams()
 
     useEffect( ()=>{
         getCourse()
@@ -65,18 +63,49 @@ export function CoursePage() {
 
             var temp:Array<any> = []
             course.Chapters.forEach((chapter: AnyObject, i: number) => {
-                temp.push({id: i, Name: chapter.Name, Sections:chapter.Sections})
+                temp.push({id: i, _id: chapter._id, Name: chapter.Name, Sections:chapter.Sections})
             });
             setChapters(temp)
         })
     },[])
 
+    const onEditClick = () => {
+        setPopup(true);
+    }
+
+    const onUpdateClick = () => {
+        console.log('Update Button Clicked')
+        const chapters:any = document.querySelectorAll('#chapter')
+        const sections = document.querySelectorAll('#sections')
+        const temp: ObjectX = {}
+        for (let i = 0; i < chapters.length; i++) {
+            const chapter = chapters[i];
+            const sectionList = sections[i].querySelectorAll('p');
+            const secNames:Array<string> = []
+            sectionList.forEach(val=>secNames.push(val.innerHTML))
+            temp[i.toString()] = {ChapterName: chapter.innerHTML, _id: chapter.dataset.id, SectionNames: secNames}
+        }
+        updateCourse(params.Course!, title, intro, temp)
+    }
+
     return (
         <div>
             <Bar />
-            <ImgTextSection title={title} text={intro}/>
+            <ImgTextSection onEditClick={onEditClick} title={title} text={intro}/>
                 <br/>
             <Course chaps={chapters}/>
+            <PopupCard isVisible={popup} setPopup={setPopup}>
+                <div className={popupStyles.InputHolder}>
+                    <h1 className={popupStyles.Title}>Update course details</h1>
+                    <InputField customStyle={{backgroundColor: '#FFF', width: '20rem'}} value={title} set={setTitle} label={"Course Name"} />
+                    <textarea value={intro} onChange={e=>setIntro(e.target.value)} placeholder='Intro...' className={popupStyles.InputField} name="" id=""></textarea>
+                    {/* <button onClick={CreateCourse} className={buttonStyles.PrimaryButton}>Create</button> */}
+                    {/* <PrimaryButton onClick={onUpdateClick} text='Create'/> */}
+                </div>
+            </PopupCard>
+            <div className={styles.Section}>
+                <h2 className={styles.Title}><PrimaryButton onClick={onUpdateClick} text='Update'/></h2>
+            </div>
             <Footer />
         </div>
     )
@@ -107,7 +136,7 @@ export function Course({chaps}:{chaps:Array<any>}) {
         if (chaps.length > 0){
         const temp = chaps.map(chp=>{
             console.log(chp.Sections)
-            return {id: chp.id+1, Chapter: chp.id, Title: chp.Name, Sections: chp.Sections}
+            return {id: chp.id+1, _id: chp._id, Chapter: chp.id, Title: chp.Name, Sections: chp.Sections}
         })
         console.log('tempL ', temp)
         setChapters(temp)
@@ -142,9 +171,6 @@ export function Course({chaps}:{chaps:Array<any>}) {
             val.Name = inputs[i+1].value
         })
     
-        // temp_sections.forEach((val:any)=>{
-        //     console.log("AS: ", val)
-        // })
         temp_chapters[index].Title = chapterName;
         temp_chapters[index].Sections = temp_sections;
         setChapters(temp_chapters)
@@ -206,7 +232,7 @@ export function Course({chaps}:{chaps:Array<any>}) {
             <DndContext sensors={sensors} onDragEnd={e=>onDragEnd(e, 'chapters')} collisionDetection={closestCorners}>
             <SortableContext items={chapters} strategy={verticalListSortingStrategy}>
             {chapters.map((chapter: any)=>
-                <Chapter setIsUpdate={setIsUpdate} setChapterName={setChapterName} key={chapter.id} chapter={chapter.Chapter} setPopup={setPopup} id={chapter.id} title={chapter.Title} sections={chapter.Sections} setSections={setSections}/>
+                <Chapter setIsUpdate={setIsUpdate} setChapterName={setChapterName} key={chapter.id} _id={chapter._id} chapter={chapter.Chapter} setPopup={setPopup} id={chapter.id} title={chapter.Title} sections={chapter.Sections} setSections={setSections}/>
             )}
             </SortableContext>
             </DndContext>
@@ -214,6 +240,7 @@ export function Course({chaps}:{chaps:Array<any>}) {
             <div onClick={openAddChapterPopup} className={styles.Section}>
                 <h2 className={styles.Title}><img className={styles.AddImg} src={addImg} alt="" /></h2>
             </div>
+            
 
             <PopupCard isVisible={popup} setPopup={setPopup}>
                 <form onSubmit={(e:any)=>onCourseEdit(e)} className={styles.Form}>
@@ -242,7 +269,7 @@ export function Course({chaps}:{chaps:Array<any>}) {
 }
 
 
-export function Chapter({title, sections, setSections, setChapterName, setIsUpdate, id, chapter, setPopup}: ChapterProps) {
+export function Chapter({title, sections, setSections, setChapterName, setIsUpdate, _id, id, chapter, setPopup}: ChapterProps) {
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
 
     const ele: RefObject<HTMLDivElement> = useRef(null);
@@ -251,7 +278,7 @@ export function Chapter({title, sections, setSections, setChapterName, setIsUpda
 
     console.log("Chp: ", chapter)
     const items = (sections.map((item: any, i: any)=>(
-        <Section key={i} chp_id={chapter} id={i} title={item.Name+': '+(item.Content??'')}/>
+        <Section key={i} chp_id={chapter} id={i} title={item.Name}/>
     )))
 
     
@@ -283,9 +310,9 @@ export function Chapter({title, sections, setSections, setChapterName, setIsUpda
         <div ref={setNodeRef} {...attributes} {...listeners} style={style} className={styles.Section}>
             <div className={styles.box} onClick={onClick}>
                 <FaRegEdit onClick={onEditClick} className={buttonStyles.Edit}/>
-                <h2 ref={symbol} data-symbol=" ▸" className={styles.Title}>{title}</h2>
+                <h2 id='chapter' data-id={_id} ref={symbol} data-symbol=" ▸" className={styles.Title}>{title}</h2>
             </div>
-            <div ref={ele} className={styles.List}>
+            <div id='sections' ref={ele} className={styles.List}>
                 {items}
             </div>
         </div>
@@ -323,7 +350,7 @@ function SectionField({id, index, tempValue, remove}: SectionFieldProps) {
     return (
         <div ref={setNodeRef} {...attributes} {...listeners} style={style}>
             <InputField tempvalue={tempValue} customStyle={{backgroundColor: '#DDD'}} label={`Section ${index}`}>
-                <FaDeleteLeft onClick={()=>remove?remove(id):undefined} color='red' size={'1.5rem'} className={styles.Remove}/>
+                <FaDeleteLeft onClick={()=>remove!(id)} color='red' size={'1.5rem'} className={styles.Remove}/>
             </InputField>
         </div>
     )

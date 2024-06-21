@@ -1,4 +1,4 @@
-import { register, login, saveCourse, loadCourse, getChapter, getChapters, getSection, getSections, getUser, getCourse, createCourse, updateUser, deleteCourse } from './dbconn.js';
+import { register, login, getUser, getCourse, createCourse, updateUser, deleteCourse, updateCourse } from './dbconn.js';
 
 import { join } from 'path';
 import cors from 'cors';
@@ -81,28 +81,16 @@ app.post('/api/CreateCourse', auth, (req, res) => {
 
 })
 
-app.post('/api/SaveCourse',(req, res) => {
+app.post('/api/UpdateCourse/:CourseName', auth, (req, res) => {
     var data = req.body;
-    console.log(data, typeof(data))
-    saveCourse(data.Name)
-    .then((id)=>{
-        req.session.courseID = id;
-        res.json("Done: " + req.session.courseID);
-    })
+    console.log(data)
+    updateCourse(req.data.user, req.params.CourseName, data.courseName, data.intro, data.chapters)
 })
 
 app.delete('/api/DeleteCourse/:Course', auth, (req, res) => {
     console.log("Deleting:", req.data.user+ "'s Course",req.params.Course)
     deleteCourse(req.data.user, req.params.Course)
     
-})
-
-app.use('/api/loadCourse', (req, res) => {
-    const data = req.body
-    loadCourse(data.id).then((data)=>{
-        console.log(data);
-        res.json(data);
-    })
 })
 
 app.use('/api/addSection', (req, res) => {

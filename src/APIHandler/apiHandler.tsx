@@ -43,3 +43,17 @@ export async function deleteApi(url: string) {
 export function setToken(token: string){
     options.headers.Authorization = `Bearer ${token}`
 }
+
+
+export async function getCourse() {
+    console.log("Fething ", window.location.pathname)
+    const response = await postApi(window.location.pathname, {})
+    const data = await response.json();
+    console.log("Retrieved  data: ", data)
+    return data;
+}
+
+export function updateCourse(original:string, courseName:string, intro: string, chapters: ObjectX) {
+    console.log({courseName, intro, chapters})
+    postApi('/UpdateCourse/'+original, {courseName, intro, chapters})
+}

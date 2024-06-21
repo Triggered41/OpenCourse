@@ -40,6 +40,7 @@
     padding-top: 1rem;
     width: 45%;
     color: rgb(0, 0, 0);
+    position: relative;
 }
 
 @media screen and (max-width: 600px ) {
@@ -81,4 +82,17 @@
 }
 .Quotes::after{
     content: "\275E";
+}
+
+.EditButton{
+    position: absolute;
+    right: 0;
+}
+
+.EditButton:hover{
+    scale: 1.1;
+    box-shadow: #00000080 3px 3px;
+}
+.EditButton:active{
+    scale: 0.9;
 }

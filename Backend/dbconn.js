@@ -24,11 +24,13 @@ courseSchema.index({Name: 1, Author: 1}, {unique: true});
 
 const chapterSchema = new mongoose.Schema({
     Name: String,
+    Order: Number,
     Sections: [{type: ObjectId, ref: 'sections'}]
 })
 
 const sectionSchema = new mongoose.Schema({
     Name: String,
+    Order: Number,
     Content: String
 })
 
@@ -122,7 +124,7 @@ export function addChapter(Id, Name) {
     })
 }
 
-export async function getCourse(authorName, courseName, projections={Name: 1}) {
+export async function getCourse(authorName, courseName, projections={Name: 1, _id: 1}) {
     const baseCourse = await userModel.aggregate([
         {$match: {UserName: authorName}},
         {$lookup: {from: 'courses', localField: 'Courses', foreignField: '_id', as: 'cs'}},
@@ -130,8 +132,31 @@ export async function getCourse(authorName, courseName, projections={Name: 1}) {
         {"$match": {"cs.Name": courseName}}
     ])
     if (baseCourse.length == 0) return false;
-    const fullCourse = await courseModel.findOne(baseCourse[0].cs).populate({path: 'Chapters', populate: {path: 'Sections', select: projections}});
+    const fullCourse = await courseModel.findOne(baseCourse[0].cs).populate({path: 'Chapters', options: { sort: {Order: 1} }, populate: {path: 'Sections', options: { sort: {Order: 1}}, select: projections}});
+    console.log(fullCourse)
     return fullCourse;
+}
+
+export async function updateCourse(userName, original, courseName, intro, chapters) {
+    const user = await userModel.findOne({UserName: userName});
+    const courseUpdate = await courseModel.updateOne({Name: original, Author: user._id},
+        {
+            "$set": {Name: courseName, Intro: intro}
+        }
+    )
+    var temp = Object.values(chapters).map((val, i)=>({
+        
+        updateOne: {
+            filter: {_id: val._id}, 
+            update: { '$set': { Name: val.ChapterName, Order: i+1 } }
+        }
+    }))
+    await chapterModel.bulkWrite(temp)
+
+    // const temp = Object.values(val.SectionNames)
+    // temp.forEach((val, i)=>{
+
+    // })
 }
 
 export async function getUser(userName, projection={}, selection='') {
