@@ -77,7 +77,6 @@ app.post('/api/CreateCourse', auth, (req, res) => {
         })
         .catch(err=>{console.error(err)})
     })
-    // createCourse(data.Name, data.Intro, )
 
 })
 

@@ -22,7 +22,11 @@
     transform: scale(1.05);
     outline: solid #9fe9a9F0 5px;
 }
-
+.PrimaryButton:active{
+    transition-duration: 100ms;
+    scale: 0.95;
+    outline: solid #0000 0;
+}
 .PrimaryButton:disabled{
     background-color: transparent;
     color: #444;

@@ -1,4 +1,4 @@
-import { CSSProperties, MouseEvent, useEffect } from 'react';
+import { CSSProperties, MouseEvent } from 'react';
 import styles from './ButtonStyles.module.css'
 
 interface ButtonProps{

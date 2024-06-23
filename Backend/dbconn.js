@@ -144,19 +144,59 @@ export async function updateCourse(userName, original, courseName, intro, chapte
             "$set": {Name: courseName, Intro: intro}
         }
     )
-    var temp = Object.values(chapters).map((val, i)=>({
-        
-        updateOne: {
-            filter: {_id: val._id}, 
-            update: { '$set': { Name: val.ChapterName, Order: i+1 } }
+    // var temp = Object.values(chapters).map((val, i)=>({
+
+    //     updateOne: {
+    //         filter: {_id: val._id}, 
+    //         update: { '$set': { Name: val.Name, Order: i+1 } }
+    //     }
+    //     // insertOne if _id = undefined
+
+    // }))
+    // await chapterModel.bulkWrite(temp)
+
+    // For Each Chapter
+    Object.values(chapters).forEach(async val=>{
+        // Check if Chapter Exists
+        if (val._id !== undefined){
+            var temp = []
+            val.Sections.forEach( (val, i)=>{
+            console.log("Section:", val.Name, '=', i+1)
+            temp.push(
+                // Add or update section
+                val._id !== undefined ?
+                {
+                    updateOne: {
+                        filter: {_id: val._id},
+                        update: { '$set': {Name: val.Name, Order: i+1}}
+                    }
+                }
+                :
+                {
+                    insertOne: {
+                        "document": {
+                            Name: val.Name,
+                            Order: i+1,
+                            Content: '',
+                        }
+                    }
+                }
+            )
+        })
+        const status = await sectionModel.bulkWrite(temp)
+        if (status.insertedCount !== 0){
+            var sections_id = []
+            for (let i = 1; i <= status.insertedCount; i++) {
+                const id = status.insertedIds[i];
+                sections_id.push(id)
+            }
+            await chapterModel.updateOne({ _id: val._id }, { "$push": { "Sections": { "$each": sections_id } } })
         }
-    }))
-    await chapterModel.bulkWrite(temp)
+    }else{
+        // If Chapter Does not exist create new Chapter and new sections
+    }
+    })
 
-    // const temp = Object.values(val.SectionNames)
-    // temp.forEach((val, i)=>{
-
-    // })
 }
 
 export async function getUser(userName, projection={}, selection='') {

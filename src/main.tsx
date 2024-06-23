@@ -4,20 +4,17 @@ import './index.module.css';
 import './snow.css';
 import './custom_toolbar.css';
 import App from './App';
+import store from './StoreManager/store.ts'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { RegisterForm } from './Components/Forms/Register.tsx';
 import { LoginForm } from './Components/Forms/Login.tsx';
 import { HomePage } from './Components/homepage.tsx';
 import { CoursePage } from './Components/Course/CoursePage.tsx';
 import { Course } from './Components/Course/Course.tsx';
-// import { Test } from './Components/Course/test';
 import { PageCreator } from './Components/Creator/PageCreator.tsx';
 import { Profile } from './Components/Profile/Profile.tsx';
-// import { Card } from './Components/Card/Card.tsx';
-// import { InputField } from './Components/InputField/InputField.tsx';
-// import { PopupCard } from './Components/Popup/Popup.tsx';
-// import { Draggable } from './Components/Draggable/Draggable.tsx';
 import { DragMenu } from './Components/Draggable/testDrag.tsx';
+import { Provider } from 'react-redux';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
@@ -68,7 +65,9 @@ root.render(
   // <React.StrictMode>
   //   {/* <App /> */}
   // </React.StrictMode>
+    <Provider store={store}>
     <RouterProvider router={router}/>
+    </Provider>
 );
 
 // If you want to start measuring performance in your app, pass a function

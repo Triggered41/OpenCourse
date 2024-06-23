@@ -7,7 +7,6 @@ import Bar from './NavBar/NavBar'
 import { ImgTextSection } from './ImgTextSection.tsx'
 import { Card } from './Card/Card'
 import Footer from './Footer'
-
 // const url = 'http://localhost:3300/';
 
 export function HomePage() {
