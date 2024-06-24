@@ -138,25 +138,9 @@ export async function getCourse(authorName, courseName, projections={Name: 1, _i
 }
 
 export async function updateCourse(userName, original, courseName, intro, chapters) {
-    const user = await userModel.findOne({UserName: userName});
-    const courseUpdate = await courseModel.updateOne({Name: original, Author: user._id},
-        {
-            "$set": {Name: courseName, Intro: intro}
-        }
-    )
-    // var temp = Object.values(chapters).map((val, i)=>({
-
-    //     updateOne: {
-    //         filter: {_id: val._id}, 
-    //         update: { '$set': { Name: val.Name, Order: i+1 } }
-    //     }
-    //     // insertOne if _id = undefined
-
-    // }))
-    // await chapterModel.bulkWrite(temp)
-
-    // For Each Chapter
-    Object.values(chapters).forEach(async val=>{
+    var newChapters = []
+    const loopPromise = new Promise((res, rej)=>{
+        Object.values(chapters).forEach(async (val, i)=>{
         // Check if Chapter Exists
         if (val._id !== undefined){
             var temp = []
@@ -190,12 +174,50 @@ export async function updateCourse(userName, original, courseName, intro, chapte
                 const id = status.insertedIds[i];
                 sections_id.push(id)
             }
+            console.log('Ids:', sections_id)
             await chapterModel.updateOne({ _id: val._id }, { "$push": { "Sections": { "$each": sections_id } } })
         }
     }else{
         // If Chapter Does not exist create new Chapter and new sections
+        
+        const sectionsOps = val.Sections.map((section, i)=>{
+            console.log("Section:", section)
+            return {
+                insertOne: {
+                    "document": {
+                        Name: section.Name,
+                        Order: i+1,
+                        Content: ''
+                    }
+                }
+            }
+
+        })
+        const secStatus = await sectionModel.bulkWrite(sectionsOps)
+        var sectionsID = []
+        for(let i = 0; i<secStatus.insertedCount; i++){
+            const id = secStatus.insertedIds[i]
+            sectionsID.push(id)
+        }
+
+        const newChapter = new chapterModel({ Name: val.Name, Order: i+1, Sections: sectionsID })
+        newChapters.push(newChapter._id)
+        await newChapter.save()
+        res()
     }
     })
+    })
+    loopPromise.then(async ()=>{
+        console.log("New Chap:", newChapters)
+        const user = await userModel.findOne({UserName: userName});
+        const courseUpdate = await courseModel.updateOne({Name: original, Author: user._id},
+            {
+                "$set": {Name: courseName, Intro: intro},
+                "$push": { "Chapters": { "$each": newChapters } }
+            }
+        )
+    })
+    
 
 }
 

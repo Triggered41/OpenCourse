@@ -1,3 +1,8 @@
+// Over time it grew what once was a baby is now a huge messy monster, I am sorry!
+// I want to clean it up if it's possible at all, but I am tired and lazy and maybe even afraid of breaking 
+// something that's working prefectly fine
+
+
 import styles from './CoursePage.module.css'
 import popupStyles from '../Popup/popup.module.css'
 import buttonStyles from '../Button/ButtonStyles.module.css'
