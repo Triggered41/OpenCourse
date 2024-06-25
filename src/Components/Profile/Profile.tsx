@@ -1,5 +1,4 @@
 import styles from './Profile.module.css';
-import buttonStyles from '../Button/ButtonStyles.module.css';
 
 import popupStyles from '../Popup/popup.module.css'
 
@@ -7,7 +6,7 @@ import img from '../BGTeddy.png';
 import addImg from '../Course/AddImg.png'
 import Bar from '../NavBar/NavBar';
 import { Card } from '../Card/Card';
-import { MouseEvent, RefObject, useEffect, useState } from 'react';
+import { MouseEvent, useEffect, useState } from 'react';
 import { deleteApi, postApi } from '../../APIHandler/apiHandler.tsx';
 import Footer from '../Footer.tsx';
 import { checkLogin } from '../../APIHandler/checkLogin.tsx';
@@ -16,7 +15,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { InputField } from '../InputField/InputField';
 import { PopupCard } from '../Popup/Popup';
 import { PrimaryButton } from '../Button/Buttons.tsx';
-import { onFieldChange } from '../InputField/inputFieldAnim.tsx';
 
 
 export function Profile() {
@@ -77,8 +75,7 @@ export function Profile() {
         setDeletePopup(true)
         setDeleteName(Name)
     }
-    const onConfirmChange: any = (val: string, set:Function, ref: RefObject<HTMLElement>, submitRef:RefObject<HTMLButtonElement>) => {
-        onFieldChange(val, set, ref, submitRef)
+    const onConfirmChange: any = (val: string) => {
         setIsDisabled(val !== deleteName)
     }
     const onDeleteClick = (event: SubmitEvent) => {

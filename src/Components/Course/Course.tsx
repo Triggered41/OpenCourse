@@ -6,6 +6,7 @@ import Bar from "../NavBar/NavBar.tsx";
 import { getApi } from "../../APIHandler/apiHandler.tsx";
 
 async function getData(){
+    
     const params: ObjectX = new Proxy(new URLSearchParams(window.location.search), {
         get: (searchParams, prop:string) => searchParams.get(prop),
       });

@@ -1,4 +1,4 @@
-import { CSSProperties, FocusEventHandler, ReactNode, RefObject, useEffect, useRef, useState } from "react";
+import { CSSProperties, ChangeEvent, ChangeEventHandler, FocusEventHandler, ReactNode, RefObject, useEffect, useRef, useState } from "react";
 import styles from './InputField.module.css'
 import { onFieldChange } from "./inputFieldAnim.tsx";
 
@@ -31,10 +31,15 @@ export function InputField({name, type, label, value, tempvalue, set, onChange, 
         }
     }, [])
 
+    const onInputChange = (e:any) => {
+        onChange ? onChange(e.currentTarget!.value) : undefined
+        onFieldChange(e.currentTarget!.value, set ?? setText, labelRef, submitRef)
+    }
+
     return (
         <div ref={myRef} onBlur={onBlur?(e)=>onBlur(e):undefined} onFocus={onFocus?(e)=>onFocus(e):undefined} className={styles.InputField}>
             {Icon}
-            <input data-index={data_index} className={styles.TypeField} style={customStyle} required name={name} type={type} onChange={(e)=>onChange ? onChange(e.target.value, set ?? setText, labelRef, submitRef) : onFieldChange(e.target.value, set ?? setText, labelRef, submitRef)} value={value ?? text}/>
+            <input data-index={data_index} className={styles.TypeField} style={customStyle} required name={name} type={type} onChange={(e:any)=>onInputChange(e)} value={value ?? text}/>
             <label className={styles.Label} ref={labelRef} htmlFor="Email">{label ?? 'Label'}</label>
             {children}
         </div>

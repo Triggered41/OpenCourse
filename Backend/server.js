@@ -1,4 +1,4 @@
-import { register, login, getUser, getCourse, createCourse, updateUser, deleteCourse, updateCourse } from './dbconn.js';
+import { register, login, getUser, getCourse, createCourse, updateUser, deleteCourse, updateCourse, getSection } from './dbconn.js';
 
 import { join } from 'path';
 import cors from 'cors';
@@ -113,16 +113,27 @@ app.post("/api/user/:UserName/:Course", (req, res)=>{
 })
 
 app.get("/api/user/:UserName/:Course/id", (req, res)=>{
-    console.log(req.query)
+    console.log("Query:", req.query)
     const params = req.params; 
     const query = req.query; 
-    getCourse(params.UserName, params.Course, {Name: 1, Content: 1})
+    getCourse(params.UserName, params.Course, {_id: 1, Order: 1})
     .then(course => {
-        const section = course.Chapters[query.chp].Sections[query.sec]
-        console.log(section)
-        res.json(section)
+        console.log("Course:", )
+        const sectionID = course.Chapters.find(val=>val.Order==query.chp).Sections.find(val=>val.Order==query.sec)
+        console.log(sectionID)
+        getSection(sectionID._id)
+        .then((section)=>{
+            res.json(section)
+        })
     })
     
+})
+
+app.get('/api/getSection/:id', (req, res) => {
+    getSection(req.params.id)
+    .then(section=>{
+        res.json(section)
+    })
 })
 app.use('*', (req, res)=>{
     res.sendFile(join(__dirname, 'dist/index.html'))

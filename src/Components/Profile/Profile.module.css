@@ -41,7 +41,12 @@
     text-align: center;
     border: none;
     background-color: transparent;
+    font-size: larger;
     /* background-image: linear-gradient(to right, palevioletred, #ffffffe0); */
+}
+
+.Profile .Details .Field:is(label){
+    font-size: 1rem;
 }
 
 .Title{

@@ -48,7 +48,7 @@ const router = createBrowserRouter([
     element: <Course />
   },
   {
-    path: 'user/:Profile/PageCreator',
+    path: 'user/:Profile/:Course/Editor',
     element: <PageCreator />
   },
   {

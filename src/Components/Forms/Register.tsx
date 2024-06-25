@@ -31,8 +31,9 @@ export function RegisterForm() {
         setIsFocus(false)
     }
 
-    const onPassChange: any = (val: string, set:Function, ref: RefObject<HTMLElement>, submitRef:RefObject<HTMLButtonElement>) => {
-        onFieldChange(val, set, ref, submitRef)
+    // val: string, set:Function, ref: RefObject<HTMLElement>, submitRef:RefObject<HTMLButtonElement>
+    const onPassChange: any = (val: string) => {
+        // onFieldChange(val, set, ref, submitRef)
         var temp = [false, false, false, false]
         temp[0] = val.length >= 8
         temp[1] = new RegExp(/[a-z]/).test(val);
@@ -67,7 +68,6 @@ export function RegisterForm() {
             errRef.current!.classList.add(ErrorAnim.Error)
             return;
         }
-        
         postApi('register', {Name: name, UserName: userName, Email: email, Pass: pass})
             .then(res => res.json())
             .then(data => {

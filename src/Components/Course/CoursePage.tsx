@@ -42,7 +42,8 @@ interface ChapterProps{
 interface SectionProps{
     title: string,
     chp_id: Number|string,
-    id: Number
+    id: number,
+    _id: string
 }
 
 interface SectionFieldProps{
@@ -98,7 +99,7 @@ export function CoursePage() {
             <PopupCard isVisible={popup} setPopup={setPopup}>
                 <div className={popupStyles.InputHolder}>
                     <h1 className={popupStyles.Title}>Update course details</h1>
-                    <InputField customStyle={{backgroundColor: '#FFF', width: '20rem'}} value={title} set={setTitle} label={"Course Name"} />
+                    <InputField customStyle={{backgroundColor: '#FFF', width: '20rem'}} value={title} tempvalue={title} set={setTitle} label={"Course Name"} />
                     <textarea value={intro} onChange={e=>setIntro(e.target.value)} placeholder='Intro...' className={popupStyles.InputField} name="" id=""></textarea>
                     {/* <button onClick={CreateCourse} className={buttonStyles.PrimaryButton}>Create</button> */}
                     {/* <PrimaryButton onClick={onUpdateClick} text='Create'/> */}
@@ -231,7 +232,7 @@ export function Course() {
 
             <PopupCard isVisible={popup} setPopup={setPopup}>
                 <form onSubmit={(e:any)=>onCourseEdit(e)} className={styles.Form}>
-                    <InputField value={chapterName} tempvalue={chapterName} set={setChapterName} customStyle={{backgroundColor: '#DDD'}} label={'Chapter Name'}/>
+                    <InputField value={chapterName} tempvalue={"chapterName"} set={setChapterName} customStyle={{backgroundColor: '#DDD'}} label={'Chapter Name'}/>
                     
                     <DndContext sensors={sensors} onDragEnd={onDragEnd} collisionDetection={closestCorners}>
                         <SortableContext items={sections} strategy={verticalListSortingStrategy}>
@@ -263,9 +264,8 @@ export function Chapter({title, sections, setSections, setChapterName, setIsUpda
     const symbol: RefObject<HTMLHeadingElement> = useRef(null);
     const [isOpen, setIsOpen] = useState(false);
 
-    console.log("Chp: ", id)
     const items = (sections.map((item: any, i: any)=>(
-        <Section key={i} chp_id={id} id={i} title={item.Name}/>
+        <Section key={i} chp_id={id} id={i} _id={item._id} title={item.Name}/>
     )))
 
     
@@ -306,18 +306,30 @@ export function Chapter({title, sections, setSections, setChapterName, setIsUpda
     )
 }
 
-export function Section({title, chp_id, id}: SectionProps) {
+export function Section({title, chp_id, id, _id}: SectionProps) {
     const nav = useNavigate()
 
-    const onSectionClick = () => {
+    const onSectionClick = (e:MouseEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
         console.log(`Chapter: ${chp_id} Section: ${id}`)
         var path = window.location.pathname
         path = path.slice(-1)=='/' ? path : path+'/'
 
-        nav(`${path}id?chp=${chp_id}&sec=${id}`)
+        nav(`${path}id?chp=${chp_id}&sec=${id+1}`)
+    }
+
+    const onEditSectionClick = (e:MouseEvent|TouchEvent) => {
+        e.stopPropagation()
+        console.log(_id)
+        nav(`${window.location.pathname}/Editor`, { state: { sectionID: _id} })
+        
     }
     return (
-        <p onClick={onSectionClick} className={styles.Item}>{title}</p>
+        <div className={styles.SectionBox}>
+            <p onClick={onSectionClick} className={styles.Item}>{title}</p>
+            <FaRegEdit onClick={onEditSectionClick} className={buttonStyles.Edit}/>
+        </div>
     )
 }
 

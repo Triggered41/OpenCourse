@@ -1,97 +1,139 @@
-// import React, { useState, useRef, useEffect } from 'react';
-// import './styles.module.css'
-// import {Editor} from './Editor';
-// import Quill from 'quill';
+// So after banging my head against the wall for hours finally I found out
+// 1. YOU NEED 'formula' in Fin formats to allow formulas
+// 2. Write formula in data-value='expression' of a span tag along with class='ql-formula'
+// directly inserting, dangerouslyPaste, set value to rendered katex output won't work
 
-// const Delta = Quill.import('delta')
-// import './Page.css'
-// import { useParams } from 'react-router-dom';
 
-// var pressed_keys = {}
-// window.addEventListener("keydown", (ev)=>{
-//   pressed_keys[ev.key] = true;
-//   console.log(typeof(ev.key))
-//   if (pressed_keys["Control"] && pressed_keys["s"] && document.activeElement == document.querySelector('.ql-editor')){
-//     ev.preventDefault()
-//     saveCourse()
-//   }
-// })
-// window.addEventListener("keyup", (ev)=>{
-//   delete pressed_keys[ev.key];
-// })
-
-// export function PageCreator() {
-//   const [range, setRange] = useState();
-//   const [lastChange, setLastChange] = useState();
-//   const [readOnly, setReadOnly] = useState(false);
-//   const {Profile} = useParams();
-
-//   useEffect(() => {
-//     console.log("Page Creator opened by:",Profile)
-//   },[])
-
-//   const onChange = (e) => {
-//     console.log(e)
-//     setLastChange(e)
-//   }
-//   // Use a ref to access the quill instance directly
-//   const quillRef = useRef();
-//   return (
-//     <div>
-//     <Editor
-//       ref={quillRef}
-//       readOnly={readOnly}
-//       defaultValue={new Delta()
-//         .insert('Hello')
-//         .insert('\n', { header: 1 })
-//         .insert('Some ')
-//         .insert('initial', { bold: true })
-//         .insert(' ')
-//         .insert('content', { underline: true })
-//         .insert('\n')}
-//       onSelectionChange={setRange}
-//       onTextChange={setLastChange}
-//     />
-//     <div className="controls">
-//       <label>
-//         Read Only:{' '}
-//         <input
-//           type="checkbox"
-//           value={readOnly}
-//           onChange={(e) => setReadOnly(e.target.checked)}
-//         />
-//       </label>
-//       <button
-//         className="controls-right"
-//         type="button"
-//         onClick={() => {
-//           console.log(document.querySelector('.ql-editor').innerHTML)
-          
-//           // alert(quillRef.current?.getLength());
-//         }}
-//       >
-//         Get Content Length
-//       </button>
-//     </div>
-//     <div className="state">
-//       <div className="state-title">Current Range:</div>
-//       {range ? JSON.stringify(range) : 'Empty'}
-//     </div>
-//     <div className="state">
-//       <div className="state-title">Last Change:</div>
-//       {lastChange ? JSON.stringify(lastChange.ops) : 'Empty'}
-//     </div>
-//   </div>
-//   )
-// }
-
-import { useState } from 'react';
-import ReactQuill from 'react-quill';
+import { useEffect, useRef, useState } from 'react';
+import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import styles from './Page.module.css'
+import './check.css'
+import { getSection } from '../../APIHandler/apiHandler';
+import { useLocation } from 'react-router-dom';
+import hljs from 'highlight.js'
+import "highlight.js/styles/atom-one-dark.css";
+import katex from 'katex'
+import 'katex/dist/katex.css'
+
+const FormulaBlot = Quill.import('formats/formula');
+
+class CustomFormulaBlot extends FormulaBlot {
+  static create(value:any) {
+    const node = super.create();
+    katex.render(value, node, { displayMode: true });
+    node.setAttribute('data-value', value);
+    return node;
+  }
+
+  static value(domNode:any) {
+    return domNode.getAttribute('data-value');
+  }
+}
+
+Quill.register(CustomFormulaBlot, true);
+
+window.katex = katex
+
+hljs.configure({
+  languages: ["python"],
+});
+
+const toolbarOptions = [
+  ["bold", "italic", "underline", "strike"],
+  ["blockquote", "code-block"],
+
+  [{ list: "ordered" }, { list: "bullet" }],
+  ["link"],
+  [{ indent: "-1" }, { indent: "+1" }],
+
+  [{ header: [1, 2, 3, 4, 5, 6, false] }],
+
+  [{ align: [] }],
+  ['formula']
+];
+const modules = {
+  history: {
+    delay: 10000
+  },
+  syntax: {
+    highlight: function (text: string) {
+      return hljs.highlight(text, { language: 'python', ignoreIllegals: true}).value;
+    },
+  },
+  toolbar: toolbarOptions,
+  clipboard: {
+    // toggle to add extra line breaks when pasting HTML:
+    matchVisual: false,
+  },
+  formula: true,
+};
+
+const formats = [
+  "header",
+  "font",
+  "size",
+  "bold",
+  "italic",
+  "underline",
+  "strike",
+  "blockquote",
+  "code-block",
+  "list",
+  "bullet",
+  "indent",
+  "link",
+  "align",
+  "formula"
+];
 
 export function PageCreator() {
-  const [value, setValue] = useState('');
+  const { state }= useLocation()
+  const [value, setValue] = useState('<span class="ql-formula" data-value="f(x)=\\frac{1}{x}">asd</span>');
+  const editor:any = useRef(null)
+  
 
-  return <ReactQuill className={styles.Editor} theme="snow" value={value} onChange={setValue} />;
+  useEffect(()=>{
+    const a = katex.renderToString("f(x)\\frac{x}{2}", { output: 'html'})
+    getSection(state.sectionID).then(data=>{
+      console.log(data)
+      // editor.current.editor.clipboard.dangerouslyPasteHTML(a);
+
+        setValue(`<span class='ql-formula e' 
+        data-value='
+        f(x)=\\frac{1}{x^{-e}}
+        '
+        >
+        </span>
+        `)
+    })
+  }, [])
+
+
+  const onChange = (val: string) => {
+    // const re = /\/ma(.*)ma\//
+    // console.log(val)
+    // if (val)
+    // const m = val.match(re)![1]
+    // if (m != ''){
+
+    // }
+    console.log("VALUE: ", val)
+    setValue(val)
+  }
+
+  return (
+    <div>
+      <ReactQuill 
+          modules={modules}
+          formats={formats}
+          ref={editor}
+          className={styles.Editor}
+          theme="snow"
+          value={value}
+          onChange={onChange}
+          />
+    </div>
+  )
 }
+

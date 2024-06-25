@@ -20,7 +20,7 @@
 }
 
 .Popup{
-    
+    outline: solid white 5px;
     pointer-events: all;
     display: flex;
     width: 35%;

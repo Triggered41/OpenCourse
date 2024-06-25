@@ -57,3 +57,9 @@ export function updateCourse(original:string, courseName:string, intro: string, 
     console.log({courseName, intro, chapters})
     postApi('/UpdateCourse/'+original, {courseName, intro, chapters})
 }
+
+export async function getSection(ID: any) {
+    console.log("Fetching section: ", ID)
+    const data = await getApi('/getSection/'+ID).then(data=>data.json()).then(data=>data)
+    return data;
+}

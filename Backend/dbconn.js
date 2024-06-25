@@ -210,9 +210,9 @@ export async function updateCourse(userName, original, courseName, intro, chapte
     loopPromise.then(async ()=>{
         console.log("New Chap:", newChapters)
         const user = await userModel.findOne({UserName: userName});
-        const courseUpdate = await courseModel.updateOne({Name: original, Author: user._id},
+        await courseModel.updateOne({Name: original, Author: user._id},
             {
-                "$set": {Name: courseName, Intro: intro},
+                "$set": { Name: courseName, Intro: intro },
                 "$push": { "Chapters": { "$each": newChapters } }
             }
         )

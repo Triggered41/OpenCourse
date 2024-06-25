@@ -65,7 +65,11 @@
 
 .Edit{
     padding: 0.25rem;
-    /* background-color: whites; */
+    position: absolute;
+    top: 0.5rem;
+    left: 0;
+    margin-left: 25%;
+    background-color: whites;
 }
 
 .Edit:hover{
