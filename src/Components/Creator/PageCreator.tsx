@@ -4,7 +4,7 @@
 // directly inserting, dangerouslyPaste, set value to rendered katex output won't work
 
 
-import { useEffect, useRef, useState } from 'react';
+import { RefObject, useEffect, useRef, useState } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import styles from './Page.module.css'
@@ -15,6 +15,7 @@ import hljs from 'highlight.js'
 import "highlight.js/styles/atom-one-dark.css";
 import katex from 'katex'
 import 'katex/dist/katex.css'
+import { Delta } from 'quill/core';
 
 const FormulaBlot = Quill.import('formats/formula');
 
@@ -87,39 +88,91 @@ const formats = [
   "formula"
 ];
 
+var caretposition = 0;
+var arr: any = []
+var key = false
+
 export function PageCreator() {
   const { state }= useLocation()
   const [value, setValue] = useState('<span class="ql-formula" data-value="f(x)=\\frac{1}{x}">asd</span>');
-  const editor:any = useRef(null)
-  
+  const editorRef:RefObject<ReactQuill> = useRef(null)
 
   useEffect(()=>{
-    const a = katex.renderToString("f(x)\\frac{x}{2}", { output: 'html'})
     getSection(state.sectionID).then(data=>{
       console.log(data)
-      // editor.current.editor.clipboard.dangerouslyPasteHTML(a);
-
-        setValue(`<span class='ql-formula e' 
-        data-value='
-        f(x)=\\frac{1}{x^{-e}}
-        '
-        >
-        </span>
-        `)
+        setValue(Latex(`f(x)=x^2+1`))
     })
+    if (editorRef.current)
+    editorRef.current.onEditorChangeSelection = (next, src, editor)=>{
+        
+        document.onkeyup = (ev)=>{
+            key = ev.ctrlKey && ev.key=='a'
+            console.log("KI: ", key)
+        }
+        if (key) return
+        
+
+        const target = document.querySelector('.ql-editor')
+        const _range = document.getSelection()!.getRangeAt(0);
+        const range = _range.cloneRange()
+        const temp = document.createTextNode("\0"); 
+        range.insertNode(temp); 
+        caretposition = target!.innerHTML!.indexOf("\0"); 
+        temp!.parentNode!.removeChild(temp);
+
+		const selection = editor.getSelection(); // Get the current selection
+		if (selection) {
+            const re = /(?<=\$\$\s+).*?(?=\s+\$\$)/g
+            console.log("Matching: ", editor.getHTML())
+            const m = editor.getHTML().matchAll(re)
+            arr = Array.from(m, x => x)//.index+x[0].length)
+            arr = arr.filter((ele:any)=>{
+            var pos = editor.getHTML().indexOf(ele[0])
+            return !(caretposition>=pos! && caretposition<=(pos!+ele[0].length+1))
+            })
+            console.log("Final: ", arr)
+            // arr.forEach(val=>{
+            //     var pos = document.querySelector('.ql-editor')?.innerHTML.indexOf(val[0])
+            //     console.log("Start: ", pos," End: " , pos!+val[0].length, " Current: ", caretposition, 'Is inside: ', caretposition>=pos! && caretposition<=(pos!+val[0].length+1))
+            //     if (caretposition>=pos! && caretposition<=(pos!+val[0].length+1)){
+            //         console.log("Caret is inside ", val, " Values: ", editor.getText())
+            //     }
+                
+            // })
+
+			const delta = editor.getContents(selection.index, selection.length);
+			if (delta.ops!.length<=0) return
+			if (delta.ops![0].insert.formula != undefined){
+				console.log("ok")
+				editorRef.current?.editor?.deleteText(selection.index, 1)
+				editorRef.current?.editor?.insertText(selection.index, MathExp(delta.ops![0].insert.formula), 'user')
+                caretposition += 1
+			}
+		} else {
+			console.log('No selection found');
+		}	
+		};
   }, [])
 
 
   const onChange = (val: string) => {
-    // const re = /\/ma(.*)ma\//
-    // console.log(val)
-    // if (val)
-    // const m = val.match(re)![1]
-    // if (m != ''){
+    console.log("Start: ", caretposition)
+    // const re = /(?<=\$\s+).*?(?=\s+\$)/gs
+    // const m = val.matchAll(re)!
+    // var arr = Array.from(m, x => x)//.index+x[0].length)
+    // console.log(arr)
+    // arr = arr.filter(ele=>{
+    //     var pos = val.indexOf(ele[0])
+    //     return !(caretposition>=pos! && caretposition<=(pos!+ele[0].length+1))
+    // })
+    console.log("ArrayA: ", arr)
+    var fv = val
+    arr.forEach((ele:any)=>{
+        fv = val.replace(`$$ ${ele[0]} $$`, Latex(ele[0]))
+        // console.log("Index: ", index)
+    })
 
-    // }
-    console.log("VALUE: ", val)
-    setValue(val)
+    setValue(fv)
   }
 
   return (
@@ -127,7 +180,7 @@ export function PageCreator() {
       <ReactQuill 
           modules={modules}
           formats={formats}
-          ref={editor}
+          ref={editorRef}
           className={styles.Editor}
           theme="snow"
           value={value}
@@ -137,3 +190,10 @@ export function PageCreator() {
   )
 }
 
+function Latex(expression:string) {
+  return `<span class='ql-formula' data-value='${expression}'></span>\n`
+}
+
+function MathExp(expression: string) {
+	return `$$ ${expression} $$\n`
+}
