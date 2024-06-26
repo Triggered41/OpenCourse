@@ -51,6 +51,7 @@ const toolbarOptions = [
   [{ header: [1, 2, 3, 4, 5, 6, false] }],
 
   [{ align: [] }],
+  [{'background': []}],
   ['formula']
 ];
 const modules = {
@@ -85,12 +86,14 @@ const formats = [
   "indent",
   "link",
   "align",
-  "formula"
+  "formula",
+  "background"
 ];
 
 var caretposition = 0;
 var arr: any = []
 var key = false
+var ind = 0
 
 export function PageCreator() {
   const { state }= useLocation()
@@ -112,41 +115,35 @@ export function PageCreator() {
         if (key) return
         
 
-        const target = document.querySelector('.ql-editor')
-        const _range = document.getSelection()!.getRangeAt(0);
-        const range = _range.cloneRange()
-        const temp = document.createTextNode("\0"); 
-        range.insertNode(temp); 
-        caretposition = target!.innerHTML!.indexOf("\0"); 
-        temp!.parentNode!.removeChild(temp);
 
+        
 		const selection = editor.getSelection(); // Get the current selection
 		if (selection) {
-            const re = /(?<=\$\$\s+).*?(?=\s+\$\$)/g
-            console.log("Matching: ", editor.getHTML())
-            const m = editor.getHTML().matchAll(re)
+            const re = /(?<=\$\$\s+).*?(?=\s+\$\$)/gs
+            const m = editor.getText().matchAll(re)
             arr = Array.from(m, x => x)//.index+x[0].length)
+            console.log("Matched: ", arr)
             arr = arr.filter((ele:any)=>{
-            var pos = editor.getHTML().indexOf(ele[0])
-            return !(caretposition>=pos! && caretposition<=(pos!+ele[0].length+1))
+                var pos = editor.getText().indexOf(ele[0])
+                return !(caretposition>=(pos)! && caretposition<=(pos!+ele[0].length+1))
             })
-            console.log("Final: ", arr)
-            // arr.forEach(val=>{
-            //     var pos = document.querySelector('.ql-editor')?.innerHTML.indexOf(val[0])
-            //     console.log("Start: ", pos," End: " , pos!+val[0].length, " Current: ", caretposition, 'Is inside: ', caretposition>=pos! && caretposition<=(pos!+val[0].length+1))
-            //     if (caretposition>=pos! && caretposition<=(pos!+val[0].length+1)){
-            //         console.log("Caret is inside ", val, " Values: ", editor.getText())
-            //     }
-                
-            // })
 
 			const delta = editor.getContents(selection.index, selection.length);
 			if (delta.ops!.length<=0) return
 			if (delta.ops![0].insert.formula != undefined){
-				console.log("ok")
+
+                const target = document.querySelector('.ql-editor')
+                const _range = document.getSelection()!.getRangeAt(0);
+                const range = _range.cloneRange()
+                const temp = document.createTextNode("\0"); 
+                range.insertNode(temp); 
+                caretposition = target!.innerHTML!.indexOf("\0"); 
+                temp!.parentNode!.removeChild(temp);
+
+
 				editorRef.current?.editor?.deleteText(selection.index, 1)
-				editorRef.current?.editor?.insertText(selection.index, MathExp(delta.ops![0].insert.formula), 'user')
-                caretposition += 1
+                
+				editorRef.current?.editor?.insertText(selection.index, MathExp(delta.ops![0].insert.formula), "background", '#0001', 'user')
 			}
 		} else {
 			console.log('No selection found');
@@ -156,25 +153,23 @@ export function PageCreator() {
 
 
   const onChange = (val: string) => {
-    console.log("Start: ", caretposition)
-    // const re = /(?<=\$\s+).*?(?=\s+\$)/gs
-    // const m = val.matchAll(re)!
-    // var arr = Array.from(m, x => x)//.index+x[0].length)
-    // console.log(arr)
-    // arr = arr.filter(ele=>{
-    //     var pos = val.indexOf(ele[0])
-    //     return !(caretposition>=pos! && caretposition<=(pos!+ele[0].length+1))
-    // })
-    console.log("ArrayA: ", arr)
     var fv = val
+    const selection = editorRef.current?.editor?.getSelection()
     arr.forEach((ele:any)=>{
-        fv = val.replace(`$$ ${ele[0]} $$`, Latex(ele[0]))
-        // console.log("Index: ", index)
+        fv = val.replace(/\$\$(.*)\$\$/gs, Latex(ele[0]))
+        setTimeout(() => {
+            editorRef.current?.editor?.setSelection(selection!.index, 0)
+        }, 10);
     })
-
     setValue(fv)
   }
 
+  const onOK = () =>{
+    console.log("Button Clicked")
+    if (editorRef.current?.editor?.getSelection()){
+        editorRef.current?.editor?.insertText(editorRef.current?.editor?.getSelection()?.index!, '$$ typeHere $$', 'silent')
+    }
+  }
   return (
     <div>
       <ReactQuill 
@@ -186,14 +181,17 @@ export function PageCreator() {
           value={value}
           onChange={onChange}
           />
+          <button onClick={onOK}>OK</button>
     </div>
   )
 }
 
 function Latex(expression:string) {
-  return `<span class='ql-formula' data-value='${expression}'></span>\n`
+  return `<span class='ql-formula' data-value='${expression}'></span>`
 }
 
 function MathExp(expression: string) {
-	return `$$ ${expression} $$\n`
+    // there was some problem with auto inserting $$ so,
+    // intentionally left ending $$, so now user has to explicitly end with $$ to end latex writing
+	return `$$ ${expression} `
 }
