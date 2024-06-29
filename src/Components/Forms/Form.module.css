@@ -1,7 +1,6 @@
-:root{
-    /* overflow: hidden; */
+/* :root{
     height: 100svh;
-}
+} */
 .Form{
     overflow: hidden;
     display: flex;

@@ -1,7 +1,9 @@
-:root{
+/* :root{
     scroll-behavior: smooth;
     overflow-x: hidden;
-}
+    padding: 0;
+    margin: 0;
+} */
 
 .ShowCase{
     display: flex;

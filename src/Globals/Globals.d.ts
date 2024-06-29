@@ -1,6 +1,10 @@
 export {};
 
 declare global {
+    interface Window {
+        twttr: any;
+    }
+
     type ObjectX = { [key: string ]: any }
 
     class AnyObject implements ObjectX{

@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { json } from 'react-router-dom';
 const ObjectId = mongoose.Types.ObjectId;
 
 const userSchema = new mongoose.Schema({
@@ -40,12 +41,19 @@ var chapterModel = null;
 var sectionModel = null;
 
 mongoose.connect('mongodb://127.0.0.1:27017/opencourse')
-.then(()=>{
+.then((db)=>{
     console.log("Successfully connected");
     userModel = mongoose.model("users", userSchema);
     courseModel = mongoose.model("courses", courseSchema);
     chapterModel = mongoose.model('chapters', chapterSchema);
     sectionModel = mongoose.model("sections", sectionSchema);
+    
+    sectionModel.findOne({Name: "Updates"}).then((res)=>{
+        console.log(JSON.stringify(res).length)
+    })
+    sectionModel.findOne({Name: "Objects"}).then((res)=>{
+        console.log(JSON.stringify(res).length)
+    })
 }
 )
 
@@ -250,6 +258,14 @@ export async function getSection(id) {
     
     const section = await sectionModel.findById(id)
     return section;
+}
+
+export async function updateSection(id, Name, Content){
+    const status = await sectionModel.updateOne({_id: id}, {
+        Name: Name,
+        Content: Content
+    })
+    return status;
 }
 
 export async function updateUser(userID, courseID){

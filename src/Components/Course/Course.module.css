@@ -26,6 +26,31 @@ body{
     }
 }
 
+.Editor{
+    margin: 0;
+    padding: 1rem;
+    margin-inline: 25%;
+    outline: none;
+    
+}
+
+.Editor h1{
+    text-align: left;
+    padding-left: 1rem;
+    font-weight: 400;
+    margin-bottom: 1rem;
+
+    color: #efefef;
+    background-image: linear-gradient(to right, #40bf95, #FFF0);
+}
+
+.Editor p{
+    padding-left: 1rem;
+}
+.Editor pre{
+    padding-left: 1rem;
+    
+}
 /* h1{
     text-align: left;
     padding-left: 25%;

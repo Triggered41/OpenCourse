@@ -1,4 +1,4 @@
-import { register, login, getUser, getCourse, createCourse, updateUser, deleteCourse, updateCourse, getSection } from './dbconn.js';
+import { register, login, getUser, getCourse, createCourse, updateUser, deleteCourse, updateCourse, getSection, updateSection } from './dbconn.js';
 
 import { join } from 'path';
 import cors from 'cors';
@@ -135,10 +135,16 @@ app.get('/api/getSection/:id', (req, res) => {
         res.json(section)
     })
 })
+
+app.put('/api/updateSection', auth, (req, res) => {
+    const data = req.body
+    updateSection(data.id, data.Name, data.Content)
+})
+
 app.use('*', (req, res)=>{
     res.sendFile(join(__dirname, 'dist/index.html'))
 })
-  
+
 app.listen(3300, "192.168.1.5", ()=>{
     console.log("Server Started at 3300");
 })

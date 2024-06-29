@@ -30,6 +30,16 @@ export async function postApi(url: string, data: object) {
     return res;
 }
 
+export async function putApi(url: string, data: ObjectX) {
+    const res = await fetch(joinURL(url), {
+        mode: 'cors',
+        method: 'put',
+        headers: { "content-type": "application/json"},
+        credentials: 'include',
+        body: JSON.stringify(data)
+    })
+    return res;
+}
 export async function deleteApi(url: string) {
     const res = await fetch(joinURL(url), {
         mode: 'cors',
@@ -62,4 +72,9 @@ export async function getSection(ID: any) {
     console.log("Fetching section: ", ID)
     const data = await getApi('/getSection/'+ID).then(data=>data.json()).then(data=>data)
     return data;
+}
+
+export async function updateSection(data: ObjectX) {
+    const status = putApi('/updateSection', data)
+    console.log(status)
 }
