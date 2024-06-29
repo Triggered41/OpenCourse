@@ -29,7 +29,7 @@ import 'react-quill/dist/quill.snow.css';
 import styles from './Page.module.css'
 import './Global.css'
 import { getSection, updateSection } from '../../APIHandler/apiHandler';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import hljs from 'highlight.js'
 import "highlight.js/styles/atom-one-dark.css";
 import katex from 'katex'
@@ -38,6 +38,7 @@ import imageResize from 'quill-image-resize-module-react'
 import { FaRedo, FaUndo } from 'react-icons/fa';
 import { renderToString } from 'react-dom/server';
 import Bar from '../NavBar/NavBar';
+import { Sidebar } from '../SideBar/Sidebar';
 
 const icons = ReactQuill.Quill.import('ui/icons')
 icons['undo'] = renderToString(<FaUndo/>)
@@ -84,9 +85,9 @@ Quill.register(CustomFormulaBlot, true);
 
 window.katex = katex
 
-hljs.configure({
-  languages: ["python"],
-});
+// hljs.configure({
+//   languages: ["python"],
+// });
 
 const Toolbar = () => {
     return(
@@ -186,7 +187,7 @@ history: {
  },
   syntax: {
     highlight: function (text: string) {
-      return hljs.highlight(text, { language: 'python', ignoreIllegals: true}).value;
+      return hljs.highlightAuto(text).value;
     },
   },
   toolbar: tb,
@@ -222,6 +223,8 @@ const formats = [
 var caretposition = 0;
 var arr: any = []
 var key = false
+var useLastPos: boolean = false
+var lastPos:number = 0
 
 export function PageCreator() {
   const { state }= useLocation()
@@ -296,29 +299,50 @@ export function PageCreator() {
   const onChange = (val: string) => {
     var fv = val
     const selection = editorRef.current?.editor?.getSelection()
-    arr.forEach((ele:any)=>{
+    arr.forEach((ele:any,i:any)=>{
 		try {
+            console.log("Ele: ", ele, ', ', i)
 			katex.renderToString(Latex(ele[0]), { output: 'html', displayMode: true, strict: true })
 			fv = val.replace(/\$\$(.*)\$\$/gs, Latex(ele[0]))
+            useLastPos = true
 		} catch (error) {
 			alert("There was an error in Latex: " + error);
 			console.log(error)
 			fv = val.replace(/\$\$(.*)\$\$/gs, "$"+MathExp(ele[0]))
 		}
-        setTimeout(() => {
-            editorRef.current?.editor?.setSelection(selection!.index, 0)
-        }, 10);
+        // setTimeout(() => {
+        //     editorRef.current?.editor?.setSelection(selection!.index, 0)
+        // }, 10);
     })
+    console.log("Selec: ", selection)
+    if (useLastPos){
+        editorRef.current?.editor?.setSelection(lastPos, 0, 'user')
+        lastPos = selection!.index
+        useLastPos = false
+    }else{
+        editorRef.current?.editor?.setSelection(0, 0, 'user')
+        editorRef.current?.editor?.setSelection(selection!.index, 0, 'user')
+    }
     setValue(fv)
   }
 
   const onClic = ()=> {
-    updateSection({ id: state.sectionID, Name: "Updates", Content: JSON.stringify(quill.getContents())})
+    updateSection({ id: state.sectionID, Content: JSON.stringify(quill.getContents())})
+  }
+  const onSectionClick = (chp:number, sec:number, id:string ) => {
+    console.log("click: ", id)
+    state.sectionID = id
+    getSection(id).then(data=>{
+    console.log(data)
+    quill.setContents(JSON.parse(data.Content))
+    })
   }
 
   return (
     <div>
       <Bar />
+      <button onClick={onClic}>Click</button>
+      <Sidebar onSectionClick={onSectionClick} />
       <Toolbar/>
         <ReactQuill 
             modules={modules}
@@ -328,9 +352,9 @@ export function PageCreator() {
             theme="snow"
             value={value}
             onChange={onChange}
+            placeholder='       type here...'
             />
             
-            <button onClick={onClic}>Click</button>
       </div>
   )
 }

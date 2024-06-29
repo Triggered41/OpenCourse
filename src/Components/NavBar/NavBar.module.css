@@ -1,6 +1,7 @@
 .NavigationBar{
     /* position: fixed; */
     display: flex;
+    position: relative;
     align-items: center;
     justify-content: end;
     height: 3rem;

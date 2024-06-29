@@ -138,7 +138,7 @@ app.get('/api/getSection/:id', (req, res) => {
 
 app.put('/api/updateSection', auth, (req, res) => {
     const data = req.body
-    updateSection(data.id, data.Name, data.Content)
+    updateSection(data.id, data.Content)
 })
 
 app.use('*', (req, res)=>{

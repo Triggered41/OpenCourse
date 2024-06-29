@@ -6,6 +6,8 @@ import Bar from "../NavBar/NavBar.tsx";
 import { getApi } from "../../APIHandler/apiHandler.tsx";
 import ReactQuill from "react-quill";
 import hljs from "highlight.js";
+import { Sidebar } from '../SideBar/Sidebar.tsx'
+import { useNavigate } from "react-router-dom";
 
 async function getData(){
     
@@ -21,7 +23,7 @@ async function getData(){
 const module = {
     toolbar: false,
     syntax: {
-        highlight: (code:string)=>hljs.highlight(code, { language: 'python'}).value
+        highlight: (code:string)=>hljs.highlightAuto(code).value
     }
 }
 const formats = [
@@ -49,8 +51,9 @@ const formats = [
 export function Course() {
     const quillRef: RefObject<ReactQuill> = useRef(null);
     const [isReadOnly, setReadOnly] = useState(false)
+    const nav = useNavigate()
 
-    useEffect(()=>{
+    const loadSection = () => {
         getData()
         .then(res=>{
             const quill = quillRef.current?.getEditor()
@@ -63,11 +66,22 @@ export function Course() {
                 quill?.setText("Name: 404: Chapter or Section not found")
             }
         })
+    }
+
+    useEffect(()=>{
+        loadSection()
     }, [])
+
+    const onSectionClick = (chapterIndex:number, sectionIndex:number) => {
+        setReadOnly(false)
+        nav(`${window.location.pathname}?chp=${chapterIndex}&sec=${sectionIndex}`)
+        loadSection()
+    }
 
     return (
         <>
         <Bar />
+        <Sidebar onSectionClick={onSectionClick}/>
         <ReactQuill 
         readOnly={isReadOnly}
         ref={quillRef}

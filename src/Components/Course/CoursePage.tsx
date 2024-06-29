@@ -77,6 +77,7 @@ export function CoursePage() {
             });
             console.log("Chapters: ", temp)
             dispatch(setChapters(temp))
+            localStorage.setItem('Course', JSON.stringify(temp))
             
         })
     },[])

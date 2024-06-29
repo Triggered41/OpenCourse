@@ -159,7 +159,6 @@
     position: relative;
     text-decoration: underline;
     box-shadow: #0004 0px 3px 8px;
-    transform: scale(1.005);
     z-index: 1;
 }
 

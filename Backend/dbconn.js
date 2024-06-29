@@ -47,13 +47,6 @@ mongoose.connect('mongodb://127.0.0.1:27017/opencourse')
     courseModel = mongoose.model("courses", courseSchema);
     chapterModel = mongoose.model('chapters', chapterSchema);
     sectionModel = mongoose.model("sections", sectionSchema);
-    
-    sectionModel.findOne({Name: "Updates"}).then((res)=>{
-        console.log(JSON.stringify(res).length)
-    })
-    sectionModel.findOne({Name: "Objects"}).then((res)=>{
-        console.log(JSON.stringify(res).length)
-    })
 }
 )
 
@@ -260,9 +253,8 @@ export async function getSection(id) {
     return section;
 }
 
-export async function updateSection(id, Name, Content){
+export async function updateSection(id, Content){
     const status = await sectionModel.updateOne({_id: id}, {
-        Name: Name,
         Content: Content
     })
     return status;

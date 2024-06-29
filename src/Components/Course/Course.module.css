@@ -29,12 +29,17 @@ body{
 .Editor{
     margin: 0;
     padding: 1rem;
-    margin-inline: 25%;
+    margin-inline: 20%;
     outline: none;
+    background-color: #efefef;
     
 }
 
-.Editor h1{
+.Editor h1,
+.Editor h2,
+.Editor h3,
+.Editor h4
+{
     text-align: left;
     padding-left: 1rem;
     font-weight: 400;
@@ -46,10 +51,6 @@ body{
 
 .Editor p{
     padding-left: 1rem;
-}
-.Editor pre{
-    padding-left: 1rem;
-    
 }
 /* h1{
     text-align: left;

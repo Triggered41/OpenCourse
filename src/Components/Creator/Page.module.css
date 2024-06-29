@@ -35,6 +35,8 @@ body{
 .Editor{
     margin-inline: 25%;
     background-color: #efefef;
+    border-right: solid #808080 1px;
+    min-height: 100vh;
 }
 .Editor p{
     margin-inline: 5%;

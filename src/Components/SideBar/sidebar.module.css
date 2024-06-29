@@ -1,0 +1,56 @@
+.Sidebar{
+    user-select: none;
+    position: sticky;
+    top: 0;
+
+    padding-top: 4rem;
+    padding-left: 1rem;
+    margin-bottom: -100vh;
+
+    width: 20%;
+
+    font-size: larger;
+
+    background-color: #40bf95;
+    color: #efefef;
+
+    border-right: solid #0008;
+
+    overflow-y: auto;
+    height: 90vh;
+}
+
+.Chapter{
+    margin: 1rem;
+}
+
+.Chapter::after{
+    content: attr(data-symbol);
+}
+
+.Section{
+    margin: 0.5rem;
+    margin-left: 2rem;
+    padding-left: 1rem;
+    color: #efefef;
+    border-bottom: solid #0005;
+    
+    transition: all 250ms;
+}
+
+.Section:hover{
+    padding-left: 2rem;
+}
+
+.Selected{
+    transition: none;
+    padding-left: 2rem;
+    font-weight: 500;
+}
+
+.Foldable{
+    user-select: none;
+    overflow: hidden;
+    height: 0;
+    transition: all 250ms;
+}

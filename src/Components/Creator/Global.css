@@ -28,6 +28,10 @@
     margin-inline: auto;    
 }
 
+.ql-container{
+    padding: 0;
+}
+
 .ql-container.ql-snow{
     font-size: 1rem;
     border: 0px;
