@@ -15,6 +15,7 @@ import { PageCreator } from './Components/Creator/PageCreator.tsx';
 import { Profile } from './Components/Profile/Profile.tsx';
 import { DragMenu } from './Components/Draggable/testDrag.tsx';
 import { Provider } from 'react-redux';
+import { Test } from './Components/Course/test.tsx';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
   {
     path: '/app',
     element: <App />
+  },
+  {
+    path: '/test',
+    element: <Test />
   },
   {
     path: "/register",

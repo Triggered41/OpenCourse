@@ -257,7 +257,6 @@ export function PageCreator() {
         
         document.onkeyup = (ev)=>{
             key = ev.ctrlKey && ev.key=='a'
-            console.log("KI: ", key)
         }
         if (key) return
         
@@ -320,7 +319,7 @@ export function PageCreator() {
         lastPos = selection!.index
         useLastPos = false
     }else{
-        editorRef.current?.editor?.setSelection(0, 0, 'user')
+        // editorRef.current?.editor?.setSelection(0, 0, 'user')
         editorRef.current?.editor?.setSelection(selection!.index, 0, 'user')
     }
     setValue(fv)
