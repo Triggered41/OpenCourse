@@ -33,11 +33,16 @@ body{
 
 
 .Editor{
-    margin-inline: 25%;
+    margin-inline: 21.4%;
     background-color: #efefef;
-    border-right: solid #808080 1px;
-    min-height: 100vh;
+    min-height: 100vh;  
 }
+
+.Editor div:first-child{
+    /* background-color: #333; */
+    box-shadow: #808080 3px 3px ;
+}
+
 .Editor p{
     margin-inline: 5%;
     color: #333;

@@ -37,6 +37,44 @@
     border: 0px;
 }
 
+.copy-button{
+    z-index: 1;
+    position: absolute;
+    top: 6px;
+    right: 7rem;
+
+    background-color: #FFF4;
+    padding-inline: 0.5rem;
+    padding-top: 0.15rem;
+    color: #efefef;
+    border-radius: 0.5rem;
+}
+
+
+.copy-button:hover{
+    color: white;
+    outline: white solid 2px;
+    background-color: #FFF8;
+}
+
+.ql-ui:is(select){
+    color: #efefef;
+    padding: 0.25rem;
+    background-color: #FFF4;
+    border-radius: 0.5rem 0.5rem 0 0;
+
+    user-select: none;
+}
+
+.ql-ui:is(select):hover{
+    outline: white solid 2px;
+}
+
+.ql-ui:is(select) option{
+    color: #efefef;
+    background-color: #5e5e5e;
+}
+
 body{
     margin: 0;
 }

@@ -1,13 +1,14 @@
-import React, { forwardRef, useEffect, useLayoutEffect, useRef } from 'react';
+import { forwardRef, useEffect, useLayoutEffect, useRef } from 'react';
+
 import Quill from 'quill';
-// import katex from 'katex'
-// import 'katex/dist/katex.css'
-// window.katex = katex
-import { Delta } from 'quill/core';
+import { modules } from './EditorConfig';
+
+import 'highlight.js/lib/languages/python'
+import 'highlight.js/styles/atom-one-dark.css'
 // Editor is an uncontrolled React component
 const Editor = forwardRef(
-  ({ readOnly, defaultValue, onTextChange, onSelectionChange }:any, ref:any) => {
-    const containerRef = useRef(null);
+  ({ readOnly, defaultValue, onTextChange, onSelectionChange, className }:any, ref:any) => {
+    const containerRef:any = useRef(null);
     const defaultValueRef = useRef(defaultValue);
     const onTextChangeRef = useRef(onTextChange);
     const onSelectionChangeRef = useRef(onSelectionChange);
@@ -22,18 +23,21 @@ const Editor = forwardRef(
     }, [ref, readOnly]);
 
     useEffect(() => {
+      // console.log("HLJS: ", window.hljs)
+      // window.hljs.highlightAll()
+      // hljs.highlightAll
       const container:any = containerRef.current;
       const editorContainer = container!.appendChild(
         container!.ownerDocument.createElement('div'),
       );
       const quill = new Quill(editorContainer, {
+        modules: modules,
+        // formats: ["code-block"],
+        // formats: ["code-block"],
+        placeholder: "Type here...",
         theme: 'snow',
-        modules: {
-          formula: true,
-          toolbar: ['formula']
-        },
-        formats: ['formula']
       });
+      console.log("quill: ",quill)
 
       ref.current = quill;
 
@@ -52,9 +56,10 @@ const Editor = forwardRef(
       return () => {
         ref.current = null;
       };
+
     }, [ref]);
 
-    return <div ref={containerRef}></div>;
+    return <div className={className} ref={containerRef}></div>;
   },
 );
 

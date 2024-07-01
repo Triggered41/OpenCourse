@@ -23,8 +23,8 @@ export function Sidebar({onSectionClick}: SidebarProps){
         setCourse(JSON.parse(rawData))
     }, [])
 
-    const onChildSectionClick = (chp:any, sec:any, ref:MouseEvent, id:string) => {
-        onSectionClick(chp, sec, id)
+    const onChildSectionClick = (ref:MouseEvent, id:string) => {
+        onSectionClick(id)
         // console.log(ref.currentTarget.classList)
         if (selected){
             selected.classList.remove(styles.Selected)
@@ -63,7 +63,7 @@ function Chapter({Name, Sections, ChapterIndex, onSectionClick}:ChapterProps) {
         <h3 ref={chapterRef} onClick={onChapterClick} data-symbol="▸" className={styles.Chapter} >{Name}</h3>
             <div ref={foldableRef} className={styles.Foldable}>
                 {Sections.map((val:any, i:any)=>(
-                    <p key={i} onClick={(e)=>onSectionClick(ChapterIndex, i+1, e, val._id)} className={styles.Section}>{val.Name}</p>
+                    <p key={i} onClick={(e)=>onSectionClick(e, val._id)} className={styles.Section}>{val.Name}</p>
                 ))}
             </div>
         </>
