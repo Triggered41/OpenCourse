@@ -8,11 +8,9 @@ import { FaRedo, FaUndo } from "react-icons/fa";
 import imageResize from 'quill-image-resize-module-react'
 import katex from 'katex';
 import { FaXTwitter } from "react-icons/fa6";
-import xml from 'highlight.js/lib/languages/xml'
 import hljs from "highlight.js";
 
 window.hljs = hljs
-// window.hljs.registerLanguage('xml', xml)
 
 Quill.register('modules/imageResize', imageResize);
 
@@ -104,19 +102,14 @@ history: {
     modules: ['Resize', 'DisplaySize']
     },
     syntax: {
-      highlight: (a:any)=>{
-        console.log("Value: ", a)
-        const out = hljs.highlightAuto(a).value
-        console.log("Output: ", out)
-        return out
-      },
       hljs: hljs,
-      // languages: [
-      //   { key: 'plain', label: 'Plain' },
-      //   { key: 'go', label: 'Go' },
-      //   { key: 'xml', label: 'html/xml' },
-      //   { key: 'rust', label: 'Rust' },
-      // ],
+      languages: [
+        { key: 'plain', label: 'Plain' },
+        { key: 'go', label: 'Go' },
+        { key: 'xml', label: 'html/xml' },
+        { key: 'html', label: 'html' },
+        { key: 'rust', label: 'Rust' },
+      ],
       interval: 500,
     },
     toolbar: toolbar,

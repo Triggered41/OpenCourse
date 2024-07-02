@@ -14,11 +14,7 @@ import { Sidebar } from '../SideBar/Sidebar';
 // import styles from './Page.module.css'
 import styles from '../Creator/Page.module.css'
 import Bar from '../NavBar/NavBar';
-import html from 'highlight.js/lib/languages/xml'
-
-// window.hljs.registerLanguage('xml', html)
-console.log(Quill.version)
-
+import '../Creator/Global.css'
 
 // toolbar.handlers.tweet = ()=>{
   
@@ -134,7 +130,7 @@ export const Test = () => {
       <Editor
         ref={quillRef}
         readOnly={readOnly}
-        defaultValue={new Delta([{'insert': `<body id="A">`}, {attributes: {'code-block':'xml'}, insert: '\n'}])}
+        // defaultValue={new Delta([{'insert': `<body id="A">`}, {attributes: {'code-block':'xml'}, insert: '\n'}])}
         className={styles.Editor}
         onSelectionChange={setRange}
         onTextChange={onCha}
@@ -175,7 +171,7 @@ function Copy({data}: {data: ObjectX}) {
 
   useEffect(()=>{
     console.log("Ref: ", ref.current)
-    console.log("Refs POs: ", ref.current!.dataset!.pos)
+    console.log("Refs POs: ", data.pos)
   })
 
 

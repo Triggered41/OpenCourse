@@ -39,14 +39,16 @@
 
 .copy-button{
     z-index: 1;
-    position: absolute;
-    top: 6px;
-    right: 7rem;
-
+    position: fixed;
+    top: 0.25rem;
+    right: 27rem;
+    /* margin-right: 10rem; */
+    /* translate.; */
     background-color: #FFF4;
     padding-inline: 0.5rem;
     padding-top: 0.15rem;
     color: #efefef;
+    /* background-color: red; */
     border-radius: 0.5rem;
 }
 

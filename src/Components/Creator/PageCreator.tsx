@@ -1,369 +1,225 @@
-// So after banging my head against the wall for hours finally I found out
-// 1. YOU NEED 'formula' in Fin formats to allow formulas
-// 2. Write formula in data-value='expression' of a span tag along with class='ql-formula'
-// directly inserting, dangerouslyPaste, set value to rendered katex output won't work
-
-const tbo:any = [
-    ["bold", "italic", "underline", "strike"],
-    ["blockquote", "code-block"],
-  
-    [{ list: "ordered" }, { list: "bullet" }],
-    ["link"],
-    [{ indent: "-1" }, { indent: "+1" }],
-  
-    [{ header: [1, 2, 3, 4, 5, 6, false] }],
-  
-    [{ align: [] }],
-    [{color: []}, {'background': []}],
-    ['image', 'video'],
-    [{'customy': '<p>as</p>'}],
-    ['formula'],
-    ['undo'],
-    ['redo']
-  ]
-
-
 import { RefObject, useEffect, useRef, useState } from 'react';
-import ReactQuill, { Quill } from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+
+import Editor from '../QuillEditor/Editor';
+import Quill from 'quill';
+import 'highlight.js/styles/atom-one-dark.css'
+import { Delta } from 'quill/core';
+import { Toolbar, setQuill, toolbar } from '../QuillEditor/EditorConfig';
+import { FaRegClipboard } from 'react-icons/fa';
+import { InputField } from '../InputField/InputField';
+import { PrimaryButton } from '../Button/Buttons';
+import { useLocation } from 'react-router-dom';
+import { getSection, updateSection } from '../../APIHandler/apiHandler';
+import { Sidebar } from '../SideBar/Sidebar';
+// import styles from './Page.module.css'
 import styles from './Page.module.css'
 import './Global.css'
-import { getSection, updateSection } from '../../APIHandler/apiHandler';
-import { useLocation, useNavigate } from 'react-router-dom';
-import hljs from 'highlight.js'
-import "highlight.js/styles/atom-one-dark.css";
-import katex from 'katex'
-import 'katex/dist/katex.css'
-import imageResize from 'quill-image-resize-module-react'
-import { FaRedo, FaUndo } from 'react-icons/fa';
-import { renderToString } from 'react-dom/server';
 import Bar from '../NavBar/NavBar';
-import { Sidebar } from '../SideBar/Sidebar';
 
-const icons = ReactQuill.Quill.import('ui/icons')
-icons['undo'] = renderToString(<FaUndo/>)
-icons['redo'] = renderToString(<FaRedo/>)
-
-Quill.register('modules/imageResize', imageResize);
-
-const FormulaBlot = Quill.import('formats/formula');
-
-class CustomFormulaBlot extends FormulaBlot {
-  static create(value:any) {
-    const node = super.create();
-    katex.render(value, node, { displayMode: true });
-    node.setAttribute('data-value', value);
-    return node;
-  }
-
-  static value(domNode:any) {
-    return domNode.getAttribute('data-value');
-  }
-}
-
-const BlockEmbed = Quill.import('blots/block/embed');
-
-class TweetBlot extends BlockEmbed {
-  static blotName = 'tweet';
-  static tagName = 'div';
-  static className = 'tweet';
-
-  static create(id: string) {
-    let node = super.create();
-    node.dataset.id = id;
-    window.twttr.widgets.createTweet(id, node);
-    return node;
-  }
+// toolbar.handlers.tweet = ()=>{
   
-  static value(domNode:any) {
-    return domNode.dataset.id;
-  }
-}
+// }
 
-Quill.register(TweetBlot);
-Quill.register(CustomFormulaBlot, true);
-
-window.katex = katex
-
-// hljs.configure({
-//   languages: ["python"],
-// });
-
-const Toolbar = () => {
-    return(
-        <div id="toolbar">
-    <span className='ql-formats'>
-    <select
-      className="ql-header"
-      defaultValue={''}
-      onChange={(e) => e.persist()}
-    >
-      <option value="1"></option>
-      <option value="2"></option>
-      <option value="3"></option>
-      <option selected></option>
-    </select>
-    </span>
-
-    <span className='ql-formats'>
-        <select className='ql-font'></select>
-    </span>
-   
-    <span className='ql-formats'>
-        <button className='ql-undo'></button>
-        <button className='ql-redo'></button>
-    </span>
-    
-    <span className='ql-formats'>
-    <button className="ql-bold"></button>
-    <button className="ql-italic"></button>
-    <button className="ql-underline"></button>
-    <button className="ql-strike"></button>
-    <select className="ql-color">
-        <option selected value="#efefef"></option>
-        <option value="#222F"></option>
-        <option value="black"></option>
-        <option value="red"></option>
-        <option value="green"></option>
-        <option value="yellow"></option>
-        <option value="<input/>"></option>
-        <input/>
-    </select>
-    <select className="ql-background">
-    </select>
-    </span>
-
-
-    <span className='ql-formats'>
-    <button className='ql-blockquote'></button>
-    <button className='ql-link'></button>
-    </span>
-
-
-    <span className='ql-formats'>
-    <select className='ql-align'></select>
-    <button className='ql-list' value="ordered"></button>
-    <button className='ql-list' value="bullet"></button>
-    <button className='ql-indent' value={'-1'}></button>
-    <button className='ql-indent' value={'+1'}></button>
-    </span>
-
-    <span className='ql-formats'>
-    <button className='ql-image'></button>
-    <button className='ql-video'></button>
-    </span>
-    
-    <span className='ql-formats'>
-    <button className='ql-formula'></button>
-    <button className='ql-code-block'></button>
-    </span>
-  </div>
-
-    )
-}
-
-var quill: any = null
-const tb = {
-    container: '#toolbar',
-      handlers: {
-        customy: function () {                                       
-            quill.insertText(quill.getSelection().index, "test");                    
-        },
-        undo: ()=> quill.history.undo(),
-        redo: ()=> quill.history.redo(),
-
-      }
-}
-
-const modules = {
-history: {
-    delay: 1000,
-    maxStack: 100,
-    userOnly: false
-    },
-  imageResize: {
-    parchment: Quill.import('parchment'),
-    modules: ['Resize', 'DisplaySize']
- },
-  syntax: {
-    highlight: function (text: string) {
-      return hljs.highlightAuto(text).value;
-    },
-  },
-  toolbar: tb,
-  clipboard: {
-    // toggle to add extra line breaks when pasting HTML:
-    matchVisual: false,
-  },
-  formula: true
-};
-
-const formats = [
-  "header",
-  "font",
-  "size",
-  "bold",
-  "italic",
-  "underline",
-  "strike",
-  "blockquote",
-  "code-block",
-  "list",
-  "bullet",
-  "indent",
-  "link",
-  "align",
-  "formula",
-  "color",
-  "background",
-  "image",
-  "video"
-];
-
-var caretposition = 0;
-var arr: any = []
-var key = false
-var useLastPos: boolean = false
-var lastPos:number = 0
-
-export function PageCreator() {
+export const PageCreator = () => {
   const { state }= useLocation()
-  const [value, setValue] = useState('');
-  const editorRef:RefObject<ReactQuill> = useRef(null)
-  useEffect(()=>{   
-    
-    quill = editorRef.current!.editor
+  const [range, setRange] = useState();
+  const [lastChange, sl]:any = useState()
+  const [readOnly, setReadOnly] = useState(false);
+  const [buttons, setButtons]:any = useState([])
+  
+  // Use a ref to access the quill instance ; 
+  const quillRef:RefObject<any> = useRef(null);
 
-    // if (quill){
+  useEffect(()=>{
 
-    //     const range = quill!.getSelection(true);
-    //     const id = '1776580998215463032';
-    //     quill!.insertText(range.index, '\n', 'user');
-    //     quill!.insertEmbed(range.index + 1, 'tweet', id, 'user');
-    //     quill!.setSelection(range.index+2, 0, 'silent');
-    // }
-
-
+    const quill = quillRef.current
+    setQuill(quill)
 
     if (state){
-      getSection(state.sectionID).then(data=>{
-        console.log(data)
-        quill.setContents(JSON.parse(data.Content))
-        // setValue(data.Content)
-      })
-    }
-    if (editorRef.current)
-    editorRef.current.onEditorChangeSelection = (_next, _src, editor)=>{
-        
-        document.onkeyup = (ev)=>{
-            key = ev.ctrlKey && ev.key=='a'
+        getSection(state.sectionID).then(data=>{
+          console.log(data)
+          quill.setContents(JSON.parse(data.Content))
+          // setValue(data.Content)
+        })
+      }
+
+    // First registered handler.
+    const firstHandler = () => {
+      const sel = quill.getSelection()
+      quill.off("text-change", firstHandler);
+      console.log(sel)
+      if (sel.index>0){
+        var temp:string = quill.getText()
+        var match = temp.match(/(?<=\$\$\s+).*?(?=\s+\$\$)/gs)
+        if (match){
+          console.log("Math ", match)
+          console.log("ok: ", sel.index-match[0].length)
+          quill.deleteText(sel.index-match[0].length-6, match[0].length+6, "user");
+          try {
+            console.log("IN: ", sel.index-match[0].length-4)
+            setTimeout(() => {
+              quill.setSelection(sel.index-match![0].length-4, 0)
+            }, 10);
+            quill.insertText(sel.index-match[0].length-6, ' ', "formula", match[0])
+          } catch (error) {
+            
+          }
         }
-        if (key) return
-        
-		const selection = editor.getSelection(); // Get the current selection
-		if (selection) {
-            const re = /(?<=\$\$\s+).*?(?=\s+\$\$)/gs
-            const m = editor.getText().matchAll(re)
-            arr = Array.from(m, x => x)//.index+x[0].length)
-            console.log("Matched: ", arr)
-            arr = arr.filter((ele:any)=>{
-                var pos = editor.getText().indexOf(ele[0])
-                return !(caretposition>=(pos)! && caretposition<=(pos!+ele[0].length+1))
-            })
-
-			const delta = editor.getContents(selection.index, selection.length);
-			if (delta.ops!.length<=0) return
-			if (delta.ops![0].insert.formula != undefined){
-
-                const target = document.querySelector('.ql-editor')
-                const _range = document.getSelection()!.getRangeAt(0);
-                const range = _range.cloneRange()
-                const temp = document.createTextNode("\0"); 
-                range.insertNode(temp); 
-                caretposition = target!.innerHTML!.indexOf("\0"); 
-                temp!.parentNode!.removeChild(temp);
+      }
 
 
-				editorRef.current?.editor?.deleteText(selection.index, 1)
-                
-				editorRef.current?.editor?.insertText(selection.index, MathExp(delta.ops![0].insert.formula), "background", '#0001', 'user')
-			}
-		} else {
-			console.log('No selection found');
-		}	
-		};
-  }, [])
+      quill.on("text-change", firstHandler);
+    };
+    quill.on("text-change", firstHandler);
+
+    quill.on('selection-change', (range: { index: number, length: number }, oldRange: { index: number, length: number }, source: string)=>{
+        const con: Delta = quill.getContents(range.index, range.length)
+        if (!con) return
+        if (con.ops.length == 0) return
+        const form:any = con.ops[0].insert
+        if (form.formula){
+          console.log("formula clicked: ", con)
+          quill.deleteText(range.index, 1)
+          quill.insertText(range.index, Latex(form.formula))
+        }
+      })
+  },[])
 
 
-  const onChange = (val: string) => {
-    var fv = val
-    const selection = editorRef.current?.editor?.getSelection()
-    arr.forEach((ele:any,i:any)=>{
-		try {
-            console.log("Ele: ", ele, ', ', i)
-			katex.renderToString(Latex(ele[0]), { output: 'html', displayMode: true, strict: true })
-			fv = val.replace(/\$\$(.*)\$\$/gs, Latex(ele[0]))
-            useLastPos = true
-		} catch (error) {
-			alert("There was an error in Latex: " + error);
-			console.log(error)
-			fv = val.replace(/\$\$(.*)\$\$/gs, "$"+MathExp(ele[0]))
-		}
-        // setTimeout(() => {
-        //     editorRef.current?.editor?.setSelection(selection!.index, 0)
-        // }, 10);
+
+  const CopyButton = () => {
+    const text = document.createTextNode('Copy')
+    const ele = document.createElement('div')
+    ele.classList.add('ql-code-block')
+    ele.classList.add('copy-button')
+    ele.appendChild(text)
+    return ele
+  }
+
+  window.onscroll = (e)=>{
+    const blocks = document.querySelectorAll('.ql-code-block-container')
+    var temp:any = []
+    blocks.forEach(block => {
+      const box = block.getBoundingClientRect()
+      // console.log("pos: ", box)
+      temp.push({x: box.x, pos: box.y, data:block})
     })
-    console.log("Selec: ", selection)
-    if (useLastPos){
-        editorRef.current?.editor?.setSelection(lastPos, 0, 'user')
-        lastPos = selection!.index
-        useLastPos = false
-    }else{
-        // editorRef.current?.editor?.setSelection(0, 0, 'user')
-        editorRef.current?.editor?.setSelection(selection!.index, 0, 'user')
-    }
-    setValue(fv)
+    setButtons(temp)
+    // console.log(quillRef.current.getContents())
+}
+  const onCha = (old: Delta) => {
   }
 
-  const onClic = ()=> {
-    updateSection({ id: state.sectionID, Content: JSON.stringify(quill.getContents())})
-  }
-  const onSectionClick = (chp:number, sec:number, id:string ) => {
+  const onSectionClick = (id: string) => {
+    const quill = quillRef.current
     console.log("click: ", id)
     state.sectionID = id
     getSection(id).then(data=>{
     console.log(data)
     quill.setContents(JSON.parse(data.Content))
     })
+
+  }
+  const save = () => {
+    updateSection({id:state.sectionID, Content: JSON.stringify(quillRef.current.getContents())})
   }
 
   return (
     <div>
       <Bar />
-      <button onClick={onClic}>Click</button>
+      <button onClick={save}>OK</button>
+      <Toolbar />
+      <Tweet quill={quillRef.current}/>
       <Sidebar onSectionClick={onSectionClick} />
-      <Toolbar/>
-        <ReactQuill 
-            modules={modules}
-            formats={formats}
-            ref={editorRef}
-            className={styles.Editor}
-            theme="snow"
-            value={value}
-            onChange={onChange}
-            placeholder='       type here...'
-            />
-            
+      {buttons.map((val:any, i:number)=>(
+        <Copy key={i} data={val} />
+      ))}
+      <Editor
+        ref={quillRef}
+        readOnly={readOnly}
+        // defaultValue={new Delta([{'insert': `<body id="A">`}, {attributes: {'code-block':'xml'}, insert: '\n'}])}
+        className={styles.Editor}
+        onSelectionChange={setRange}
+        onTextChange={onCha}
+        
+      />
+      <div className="controls">
+        <label>
+          Read Only:{' '}
+          <input
+            type="checkbox"
+            onChange={(e) => setReadOnly(e.target.checked)}
+          />
+        </label>
+        <button
+          className="controls-right"
+          type="button"
+          onClick={() => {
+            alert(quillRef.current?.getLength());
+          }}
+        >
+          Get Content Length
+        </button>
       </div>
+      <div className="state">
+        <div className="state-title">Current Range:</div>
+        {range ? JSON.stringify(range) : 'Empty'}
+      </div>
+      <div className="state">
+        <div className="state-title">Last Change:</div>
+        {lastChange ? JSON.stringify(lastChange.ops) : 'Empty'}
+      </div>
+      
+    </div>
+  );
+};
+
+function Copy({data}: {data: ObjectX}) {
+  const ref:RefObject<HTMLDivElement> = useRef(null)
+
+  useEffect(()=>{
+    console.log("Ref: ", ref.current)
+    console.log("Refs POs: ", ref.current!.dataset!.pos)
+  }, [])
+
+
+  
+  const onClick = () => {
+    var code = ''
+    const codeBlock = data.data.querySelectorAll('.ql-code-block')
+    codeBlock.forEach((val:any)=>code += val.textContent + '\n')
+
+    navigator.clipboard.writeText(code).then(val=>console.log(val))
+  }
+
+  return (
+    <div ref={ref} onClick={onClick} className='copy-button' style={{translate: `0 ${data.pos}px`}}><FaRegClipboard/></div>
   )
 }
 
-function Latex(expression:string) {
-  return `<br><span class='ql-formula' data-value="${expression}"></span><br><br><br>`
+function Tweet({quill}: {quill: any}) {
+    const [value, setValue]:any = useState('')
+    const [inputBox, setInputBox]:any = useState('none')
+
+    toolbar.handlers.tweet = ()=>setInputBox('block')
+    
+    const onClick = () => {
+        const range = quill.getSelection(true);
+        quill.insertText(range.index, '\n', Quill.sources.USER);
+        quill.insertEmbed(range.index + 1, 'tweet', value, Quill.sources.USER);
+        quill.setSelection(range.index + 2, Quill.sources.SILENT)
+        setInputBox('none')
+
+    }
+
+    return (
+        <div style={{position: 'fixed', display: inputBox, top: '50vh', left: '50vw', zIndex: 1}}>
+            <InputField set={setValue} value={value} />
+            <PrimaryButton onClick={onClick} text='Confirm' />
+        </div>
+    )
 }
 
-function MathExp(expression: string) {
-    // there was some problem with auto inserting $$ so,
-    // intentionally left ending $$, so now user has to explicitly end with $$ to end latex writing
-	return String.raw`$$ ${expression} `
+function Latex(expression:string) {
+    return `$$ ${expression} `
 }
