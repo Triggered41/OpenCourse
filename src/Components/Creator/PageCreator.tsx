@@ -96,18 +96,20 @@ export const PageCreator = () => {
     return ele
   }
 
-  window.onscroll = (e)=>{
+  const updateCopyButton = ()=>{
     const blocks = document.querySelectorAll('.ql-code-block-container')
     var temp:any = []
     blocks.forEach(block => {
       const box = block.getBoundingClientRect()
       // console.log("pos: ", box)
-      temp.push({x: box.x, pos: box.y, data:block})
+      temp.push({pos: {x: box.x, y: box.y}, data:block})
     })
     setButtons(temp)
     // console.log(quillRef.current.getContents())
 }
+  window.onscroll = updateCopyButton
   const onCha = (old: Delta) => {
+    updateCopyButton()
   }
 
   const onSectionClick = (id: string) => {
@@ -193,7 +195,7 @@ function Copy({data}: {data: ObjectX}) {
   }
 
   return (
-    <div ref={ref} onClick={onClick} className='copy-button' style={{translate: `0 ${data.pos}px`}}><FaRegClipboard/></div>
+    <div ref={ref} onClick={onClick} className='copy-button' style={{translate: `0 ${data.pos.y}px`}}><FaRegClipboard/></div>
   )
 }
 

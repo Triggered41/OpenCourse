@@ -105,9 +105,8 @@ history: {
       hljs: hljs,
       languages: [
         { key: 'plain', label: 'Plain' },
+        { key: 'bash', label: 'Bash' },
         { key: 'go', label: 'Go' },
-        { key: 'xml', label: 'html/xml' },
-        { key: 'html', label: 'html' },
         { key: 'rust', label: 'Rust' },
       ],
       interval: 500,
