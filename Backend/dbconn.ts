@@ -1,54 +1,8 @@
 import mongoose from 'mongoose'
-import { json } from 'react-router-dom';
-const ObjectId = mongoose.Types.ObjectId;
-
-const userSchema = new mongoose.Schema({
-    // User Credentials
-    Name: {type: String, required: true},
-    UserName: {type: String, unique: true, required: true},
-    Email: {type: String, unique: true, required: true, collation: {strength: 1}},
-    Password: {type: String, required: true, select: false},
-
-    // User Data
-    Courses: [{type: ObjectId, ref: 'courses'}]
-    
-})
-// userSchema.index({UserName: 1, Courses: 1}, {unique: true});
-
-const courseSchema = new mongoose.Schema({
-    Name: {type: String, unique: false},
-    Intro: String,
-    Author: {type: ObjectId, ref: 'users', required: true},
-    Chapters: [{type: ObjectId, ref: 'chapters'}]
-})
-courseSchema.index({Name: 1, Author: 1}, {unique: true});
-
-const chapterSchema = new mongoose.Schema({
-    Name: String,
-    Order: Number,
-    Sections: [{type: ObjectId, ref: 'sections'}]
-})
-
-const sectionSchema = new mongoose.Schema({
-    Name: String,
-    Order: Number,
-    Content: String
-})
-
-var userModel = null;
-var courseModel = null;
-var chapterModel = null;
-var sectionModel = null;
+import { courseModel, userModel, chapterModel, sectionModel, IChapter, ICourse } from './Models/models';
 
 mongoose.connect('mongodb://127.0.0.1:27017/opencourse')
-.then((db)=>{
-    console.log("Successfully connected");
-    userModel = mongoose.model("users", userSchema);
-    courseModel = mongoose.model("courses", courseSchema);
-    chapterModel = mongoose.model('chapters', chapterSchema);
-    sectionModel = mongoose.model("sections", sectionSchema);
-}
-)
+
 
 export async function register({Name, UserName, Password, Email}) {
     console.log("rec: ", Name, Password, Email);
@@ -75,7 +29,7 @@ export async function createCourse(name, intro, userID) {
         Intro: intro,
         Author: userID
     })
-    const status = await course.save()
+    const status: any = await course.save()
     if (status.code == 11000){
         console.error(status)
     }else{
@@ -125,23 +79,28 @@ export function addChapter(Id, Name) {
     })
 }
 
-export async function getCourse(authorName, courseName, projections={Name: 1, _id: 1}) {
+export async function getCourse(authorName, courseName, projections:{Name?: number, _id: number, Order?: number}={Name: 1, _id: 1}): Promise<ICourse>{
     const baseCourse = await userModel.aggregate([
         {$match: {UserName: authorName}},
         {$lookup: {from: 'courses', localField: 'Courses', foreignField: '_id', as: 'cs'}},
         {"$unwind": "$cs"},
         {"$match": {"cs.Name": courseName}}
     ])
-    if (baseCourse.length == 0) return false;
+    if (baseCourse.length == 0) return;
     const fullCourse = await courseModel.findOne(baseCourse[0].cs).populate({path: 'Chapters', options: { sort: {Order: 1} }, populate: {path: 'Sections', options: { sort: {Order: 1}}, select: projections}});
     console.log(fullCourse)
     return fullCourse;
 }
 
+export async function searchCourse(search_words:Array<String>) {
+    const result = await courseModel.find({"$or": [{"Tags": {"$in": search_words}}, {"Name": {"$regex": search_words.join('|'), "$options": "i"}}]})
+    return result
+}
+
 export async function updateCourse(userName, original, courseName, intro, chapters) {
     var newChapters = []
     const loopPromise = new Promise((res, rej)=>{
-        Object.values(chapters).forEach(async (val, i)=>{
+        Object.values(chapters).forEach(async (val: IChapter, i)=>{
         // Check if Chapter Exists
         if (val._id !== undefined){
             var temp = []
@@ -204,7 +163,6 @@ export async function updateCourse(userName, original, courseName, intro, chapte
         const newChapter = new chapterModel({ Name: val.Name, Order: i+1, Sections: sectionsID })
         newChapters.push(newChapter._id)
         await newChapter.save()
-        res()
     }
     })
     })

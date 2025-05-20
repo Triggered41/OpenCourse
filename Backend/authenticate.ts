@@ -1,5 +1,7 @@
 import jwt from 'jsonwebtoken';
 
+// const jwt = require('jsonwebtoken')
+
 
 export function auth(req, res, next) {
     const token = req.headers.authorization?.split(' ')[1] || req.cookies.token;

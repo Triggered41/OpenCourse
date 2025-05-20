@@ -16,6 +16,7 @@ export default function Bar() {
     return (
         <nav className={styles.NavigationBar}>
             <h4 className={styles.Logo}>OpenCourse</h4>
+            <SearchField />
             <Link to='/'>Home</Link>
             <Link to='/CoursePage'>Courses</Link>
             <Link to='/About'>About</Link>
@@ -28,5 +29,11 @@ export default function Bar() {
                 
             }
         </nav>
+    )
+}
+
+const SearchField = () => {
+    return (
+        <input type='text' placeholder='Search courses' />
     )
 }

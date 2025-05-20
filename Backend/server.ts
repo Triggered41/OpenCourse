@@ -1,27 +1,27 @@
-import { register, login, getUser, getCourse, createCourse, updateUser, deleteCourse, updateCourse, getSection, updateSection } from './dbconn.js';
+import { register, login, getUser, getCourse, createCourse, updateUser, deleteCourse, updateCourse, searchCourse, getSection, updateSection } from './dbconn';
 
 import { join } from 'path';
 import cors from 'cors';
-import express from 'express'
-import 'vite-express'
-import fs from 'fs';
+import express, { Request, Response } from 'express'
+// import 'vite-express'
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
-const app = express();
+const app: any = express();
 
-import path from 'path';
+import * as path from 'path';
 import jwt from 'jsonwebtoken';
-import { auth } from './authenticate.js';
+import { auth } from './authenticate';
 const __dirname = path.resolve();
 
 app.use(express.static(join(__dirname, 'dist')))
 app.use(cors({
-    origin: ['http://192.168.1.5:5173', 'http://localhost:5173'],
+    origin: ['http://192.168.1.5:5173', 'http://localhost:5173', 'http://127.0.0.1:5173'],
     credentials: true,
 }))
 app.use(session({ secret: 'wingsofpidgeon', saveUninitialized: true, resave: true}))
 app.use(cookieParser())
 app.use(express.json())
+
 
 app.use('/api/register', (req, res) => {
     const user = req.body;
@@ -94,7 +94,7 @@ app.delete('/api/DeleteCourse/:Course', auth, (req, res) => {
 
 app.use('/api/addSection', (req, res) => {
     var data = req.body;
-    addSection(req.session.courseID, data.Name)
+    // addSection(req.session.courseID, data.Name)
     res.json(`Section ${data.name} added`);
 })
 
@@ -111,6 +111,11 @@ app.post("/api/user/:UserName/:Course", (req, res)=>{
     .then(course => res.json(course))
 
 })
+
+// app.get('/search', (req, res) => {
+//     res.write(req.query)
+//     res.end()
+// })
 
 app.get("/api/user/:UserName/:Course/id", (req, res)=>{
     console.log("Query:", req.query)
@@ -141,10 +146,19 @@ app.put('/api/updateSection', auth, (req, res) => {
     updateSection(data.id, data.Content)
 })
 
-app.use('*', (req, res)=>{
-    res.sendFile(join(__dirname, 'dist/index.html'))
+app.use('/api/search', (req: Request, res: Response) =>{
+    const search_text: String = <String>req.query['search']
+    const result = searchCourse(search_text.split(' '))
+    result.then(data => {
+        res.json(data)
+    })
 })
 
-app.listen(3300, "192.168.1.5", ()=>{
+
+app.use('*', (req: Request, res: Response)=>{
+    res.sendFile(join(__dirname, './dist/index.html'))
+})
+
+app.listen(3300, "localhost", ()=>{
     console.log("Server Started at 3300");
 })

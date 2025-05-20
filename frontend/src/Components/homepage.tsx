@@ -7,6 +7,7 @@ import Bar from './NavBar/NavBar'
 import { ImgTextSection } from './ImgTextSection.tsx'
 import { Card } from './Card/Card'
 import Footer from './Footer'
+import { useState } from 'react'
 // const url = 'http://localhost:3300/';
 
 export function HomePage() {
@@ -59,12 +60,12 @@ export function ShowCase() {
     )
 }
 
-export function Grid() {
+export function Grid({cards=[{},{},{}]}: {cards?: Array<ObjectX>}) {
+    // const [c, setC]: any = useState(cards)
+
     return (
         <div className={styles.Grid}>
-            <Card />
-            <Card />
-            <Card />
+            { cards.map(val => (<Card Title={val.Name} Description={val.Intro} />)) }
         </div>
     )
 }

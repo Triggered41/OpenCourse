@@ -1,0 +1,17 @@
+{
+  "dependencies": {
+    "@types/express": "^5.0.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "express-session": "^1.18.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.7.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.4"
+  },
+  "type": "commonjs"
+}

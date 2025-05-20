@@ -1,5 +1,7 @@
-const URLS = "http://192.168.1.5:3300/api/";
-const URL = "http://192.168.1.5:3300/api";
+const server = 'http://localhost:3300'
+// const server = 'http://192.168.1.5:3300'
+const URLS = server+"/api/";
+const URL = server+"/api";
 
 var options: ObjectX = {
     mode: 'cors',
@@ -77,4 +79,9 @@ export async function getSection(ID: any) {
 export async function updateSection(data: ObjectX) {
     const status = putApi('/updateSection', data)
     console.log(status)
+}
+
+export async function searchCourse(search: string) {
+    const result = getApi(`/search?search=${search}`).then(val=>val.json()).then(val => val)
+    return result
 }
