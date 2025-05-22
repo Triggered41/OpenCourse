@@ -38,6 +38,7 @@ export const PageCreator = () => {
     if (state){
         getSection(state.sectionID).then(data=>{
           console.log(data)
+          console.log("Quill: ", quill)
           quill.setContents(JSON.parse(data.Content))
           // setValue(data.Content)
         })
